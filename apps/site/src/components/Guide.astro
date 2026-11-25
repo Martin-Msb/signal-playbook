@@ -1,0 +1,140 @@
+---
+import { barWidth, renderScene } from "@signal-path/engine";
+import type { Guide } from "@signal-path/engine";
+import { fmtDate, loadLedger, references, stepMark } from "../lib/ledger.ts";
+import { concept, unlocks } from "../data/curriculum.ts";
+import { guides } from "../guides/index.ts";
+import Icon from "./Icon.astro";
+
+interface Props { guide: Guide }
+const { guide } = Astro.props;
+const ledger = await loadLedger();
+
+const kindLabel = { problem: "Problem", idea: "Idea", mechanism: "Mechanism", "watch-out": "Watch out", decision: "Decision" } as const;
+const c = concept(guide.slug)!;
+const live = new Set(guides.map((g) => g.slug));
+const link = (key: string) => { const k = concept(key)!; return { title: k.title, track: k.track, href: live.has(key) ? `/${k.track}/${key}/` : `/map/#${key}`, open: live.has(key) }; };
+const before = [...c.buildsOn, ...c.seeAlso].map(link), after = unlocks(c.key).map((k) => link(k.key));
+const refs = references(ledger, guide);
+const payload = JSON.stringify({
+  always: guide.scene.els.filter((e) => e.always).map((e) => e.id),
+  steps: guide.steps.map((s) => ({ label: s.label, show: s.show, counters: s.counters })),
+  whatIf: guide.whatIf ? { step: guide.whatIf.step, from: guide.whatIf.from } : undefined,
+}).replace(/</g, "\\u003c");
+const oldest = (ids: string[]) => ids.map((id) => ledger.claim(id).verified).sort()[0];
+const first = guide.steps[0];
+---
+<sp-guide data-id={guide.id} class={`t-${guide.track}`}>
+  <script is:inline type="application/json" set:html={payload}></script>
+  <header class="ghead">
+    <a class="badge" href={`/map/#${guide.slug}`} aria-label={`${guide.title} on the map`}>{c.trackName}</a>
+    <div>
+      <h1>{guide.title}</h1>
+      <p class="gmeta"><span>{c.stage}</span><span>{guide.minutes} min</span><span>{guide.status === "published" ? "Reviewed" : "Draft"}</span></p>
+    </div>
+  </header>
+  <nav class="path" aria-label="Where this concept sits">
+    <div><b>Builds on</b>{before.length ? before.map((l) => <a href={l.href} class:list={[`t-${l.track}`, { plan: !l.open }]}>{l.title}</a>) : <span>Nothing. This is where the line starts.</span>}</div>
+    {after.length > 0 && <div><b>Unlocks</b>{after.map((l) => <a href={l.href} class:list={[`t-${l.track}`, { plan: !l.open }]}>{l.title}</a>)}</div>}
+  </nav>
+
+  <nav class="route" aria-label="Stops in this guide">
+    <ol style={`--n:${guide.steps.length}`}>
+      {guide.steps.map((s, i) => (
+        <li data-stop class:list={{ cur: i === 0 }}><button type="button" data-goto={i} aria-current={i === 0 ? "step" : undefined}><span class="o">{i + 1}</span><span class="l">{s.label}</span></button></li>
+      ))}
+    </ol>
+  </nav>
+
+  <div class="guide-grid">
+    <section class="stage" aria-label="Diagram">
+      <div class="scene" set:html={renderScene(guide, 0)} />
+      {guide.whatIf && <div class="wi-flag" aria-live="polite">What if: {guide.whatIf.label.replace(/^What if /, "").replace(/\?$/, "")}<button type="button" data-whatif>Back to the guide</button></div>}
+      <div class="tip" hidden></div>
+      <div class="under">
+        <button class="pill-btn" type="button" data-replay title="Replay this stop (R)"><Icon name="replay" />Replay</button>
+        <label class="ride">Scrub<input type="range" min="0" max="1000" value="1000" data-scrub aria-label="Move the record along its route" /></label>
+        {guide.whatIf && <button class="wif" type="button" data-whatif aria-pressed="false" disabled title="Toggle (W)"><span class="sw"></span>{guide.whatIf.label}</button>}
+      </div>
+    </section>
+
+    <aside class="board" aria-label="This stop">
+      {guide.steps.map((step, i) => {
+        const mark = stepMark(ledger, step);
+        const pairs = step.body.filter((b) => "pair" in b);
+        const bars = step.body.filter((b) => "bars" in b);
+        const detail = step.body.filter((b) => "p" in b || "callout" in b);
+        return (
+          <article class:list={["sp", { current: i === 0 }]} data-step={i} id={`stop-${i + 1}`}>
+            <div class="kick"><span class="num">{i + 1}</span>Stop {i + 1} of {guide.steps.length}<span class={`kind k-${step.kind}`}>{kindLabel[step.kind]}</span></div>
+            <h2>{step.title}</h2>
+            {step.caption && <p class="cap">{step.caption}</p>}
+            {mark && bars.length === 0 && <p class="dated">{mark}</p>}
+            {pairs.map((b) => "pair" in b && (
+              <div class="fork">
+                {[b.pair.left, b.pair.right].map((side, k) => (
+                  <div class:list={["branch", { alt: k === 1 }]}><h3>{side.label}</h3><ul>{side.items.map((it) => <li>{it}</li>)}</ul></div>
+                ))}
+              </div>
+            ))}
+            {bars.map((b) => "bars" in b && (
+              <div>
+                <div class="bars" role="img" aria-label={b.bars.caption}>
+                  {b.bars.rows.map((row) => {
+                    const c = ledger.claim(row.claim);
+                    return (
+                      <div class="bar-row">
+                        <span>{row.label}</span>
+                        <div class="bar-track"><div class:list={["bar-fill", { claimed: c.flags.includes("unreleased") }]} style={`width:${barWidth(c.value!, b.bars.scale, b.bars.min, b.bars.max)}%`}></div></div>
+                        <span class="val">{c.display ?? c.value}</span>
+                      </div>
+                    );
+                  })}
+                </div>
+                <p class="dated">{b.bars.caption} Hatched: not released. Checked {fmtDate(oldest(b.bars.rows.map((r) => r.claim)))}.</p>
+              </div>
+            ))}
+            <div data-panel="detail">
+              <h3>Detail</h3>
+              {detail.map((b) => "p" in b ? <p>{b.p}</p> : "callout" in b ? <div class="callout"><b>{b.callout.label}</b>{b.callout.text}</div> : null)}
+            </div>
+          </article>
+        );
+      })}
+
+      <div class="status" aria-label="State of the system">
+        {guide.counters.map((k, j) => (
+          <div class="srow" data-row><span class="k">{k}</span><span class="v" data-counter={j}>{first.counters[j]}</span></div>
+        ))}
+      </div>
+
+      <div class="chips">
+        <button type="button" data-open-panel="detail" aria-expanded="false">Detail</button>
+        <button type="button" data-open-panel="pitfalls" aria-expanded="false">Pitfalls</button>
+        <button type="button" data-open-panel="questions" aria-expanded="false">Questions</button>
+        <button type="button" data-open-panel="governance" aria-expanded="false">Governance</button>
+        <button type="button" data-open-panel="leads" aria-expanded="false">Leads</button>
+        <button type="button" data-open-panel="references" aria-expanded="false">References</button>
+      </div>
+      <div data-panel="pitfalls"><h3>Pitfalls</h3><ul>{guide.closing.pitfalls.map((p) => <li>{p}</li>)}</ul></div>
+      <div data-panel="questions"><h3>Questions</h3><ol>{guide.closing.questions.map((q) => <li>{q}</li>)}</ol></div>
+      <div data-panel="governance"><h3>Governance and security</h3><p>{guide.governance.text}</p></div>
+      <div data-panel="leads"><h3>For leads</h3><p>{guide.forLeads}</p><p style="margin-top:8px;color:var(--muted)">{guide.summary}</p></div>
+      <div data-panel="references">
+        <h3>References</h3>
+        <ul class="refs">{refs.list.map((r) => <li><a href={r.url} rel="noopener">{r.title}</a>{r.vendor && <small>vendor source</small>}{r.secondary && <small>secondary source</small>}</li>)}</ul>
+        <p class="dated">Checked {fmtDate(refs.checked)}.</p>
+      </div>
+
+      <div class="navs">
+        <button class="nb" type="button" data-back disabled aria-label="Previous stop"><Icon name="arrowL" /></button>
+        <button class="nb go" type="button" data-next><span><small>Next stop</small><span data-next-label>{guide.steps[1]?.label}</span></span><Icon name="arrowR" /></button>
+      </div>
+      <p class="keys"><span><kbd>←</kbd> <kbd>→</kbd> stops</span><span><kbd>R</kbd> replay</span>{guide.whatIf && <span><kbd>W</kbd> what if</span>}</p>
+    </aside>
+  </div>
+</sp-guide>
+
+<script>
+  import "@signal-path/engine/runtime";
+</script>

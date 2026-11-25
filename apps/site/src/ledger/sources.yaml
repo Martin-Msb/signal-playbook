@@ -1,0 +1,73 @@
+- id: s1
+  title: "Prior Labs documentation, Models"
+  url: "https://docs.priorlabs.ai/models"
+  kind: primary
+  vendor: true
+- id: s2
+  title: "PriorLabs/TabPFN repository README"
+  url: "https://github.com/PriorLabs/tabpfn"
+  kind: primary
+  vendor: true
+- id: s3
+  title: "TabPFN-3: Technical Report, arXiv 2605.13986"
+  url: "https://arxiv.org/abs/2605.13986"
+  kind: primary
+  vendor: true
+  note: "Vendor preprint."
+- id: s4
+  title: "TabPFN-4 preview, Prior Labs, 19 November 2026"
+  url: "https://priorlabs.ai/technical-reports/tabpfn-4-preview"
+  kind: primary
+  vendor: true
+  note: "All benchmark figures are vendor-reported."
+- id: s5
+  title: "TabPFN-2.5, arXiv 2511.08667"
+  url: "https://arxiv.org/pdf/2511.08667v2"
+  kind: primary
+  vendor: true
+  note: "Vendor preprint."
+- id: s6
+  title: "TabArena: A Living Benchmark for Machine Learning on Tabular Data, arXiv 2506.16791"
+  url: "https://arxiv.org/abs/2506.16791"
+  kind: primary
+  vendor: false
+  note: "NeurIPS 2025."
+- id: s7
+  title: "Drift-Resilient TabPFN, arXiv 2411.10634"
+  url: "https://arxiv.org/pdf/2411.10634"
+  kind: primary
+  vendor: false
+  note: "States the posterior predictive view of prior-data fitted networks."
+- id: s8
+  title: "Light-Weight Benchmarks Reveal the Hidden Hardware Cost of Zero-Shot Tabular Foundation Models, arXiv 2512.00888"
+  url: "https://arxiv.org/pdf/2512.00888v2"
+  kind: primary
+  vendor: false
+  note: "Preprint."
+- {id: s9, title: "Snowflake guide: ELT and the modern ETL process", url: "https://snowflake.com/guides/modern-etl-process", kind: primary, vendor: true}
+- {id: s10, title: "dbt Labs: ETL vs ELT", url: "https://www.getdbt.com/product/elt-migration", kind: primary, vendor: true}
+- {id: s11, title: "LatentView Analytics: ETL vs ELT", url: "https://www.latentview.com/blog/etl-vs-elt/", kind: secondary, vendor: false}
+- {id: s12, title: "Domo glossary: ETL vs ELT, October 2026", url: "https://www.domo.com/glossary/etl-vs-elt", kind: secondary, vendor: true}
+- {id: s13, title: "2026 State of Data Engineering Survey, J. Reis and the Practical Data Community", url: "https://joereis.github.io/practical_data_data_eng_survey", kind: primary, vendor: false, note: "1,101 respondents. Skews senior."}
+- {id: s14, title: "dbt Labs: 2026 State of Analytics Engineering Report", url: "https://www.getdbt.com/resources/state-of-analytics-engineering-2026", kind: primary, vendor: true, note: "Vendor survey."}
+- {id: s15, title: "Apache Iceberg Table Spec", url: "https://iceberg.apache.org/spec", kind: primary, vendor: false}
+- {id: s16, title: "Apache Iceberg documentation: Reliability", url: "https://iceberg.apache.org/docs/1.7.2/reliability", kind: primary, vendor: false}
+- {id: s17, title: "Snowflake release note: Iceberg v3 general availability, 7 May 2026", url: "https://docs.snowflake.com/release-notes/2026/other/2026-05-07-iceberg-v3-ga", kind: primary, vendor: true}
+- {id: s18, title: "Apache Iceberg v4: current state and proposals, A. Merced, June 2026", url: "https://dev.to/alexmercedcoder/apache-iceberg-v4-the-current-state-the-proposals-and-why-they-matter-3e07", kind: secondary, vendor: false}
+- {id: s19, title: "dbt documentation: SQL models", url: "https://docs.getdbt.com/docs/build/sql-models", kind: primary, vendor: true}
+- {id: s20, title: "dbt documentation: the ref function", url: "https://docs.getdbt.com/reference/dbt-jinja-functions/ref", kind: primary, vendor: true}
+- {id: s21, title: "dbt documentation: best practices", url: "https://docs.getdbt.com/docs/best-practices", kind: primary, vendor: true}
+- {id: s22, title: "Fivetran and dbt Labs complete merger, press release, 1 June 2026", url: "https://www.fivetran.com/press/fivetran-dbt-labs-complete-merger-to-create-the-data-infrastructure-for-trusted-ai-agents", kind: primary, vendor: true}
+- {id: s23, title: "Anthropic: Effective context engineering for AI agents", url: "https://anthropic.com/engineering/effective-context-engineering-for-ai-agents", kind: primary, vendor: true}
+- {id: s24, title: "Beyond Semantic Similarity: Rethinking Retrieval for Agentic Search, arXiv 2605.05242", url: "https://arxiv.org/pdf/2605.05242", kind: primary, vendor: false, note: "Preprint."}
+- {id: s25, title: "Anthropic: Introducing Contextual Retrieval", url: "https://anthropic.com/news/contextual-retrieval", kind: primary, vendor: true, note: "Benchmark figures are vendor-reported."}
+- {id: s26, title: "Cormack, Clarke, Buettcher: Reciprocal Rank Fusion outperforms Condorcet and individual Rank Learning Methods, SIGIR 2009", url: "https://plg.uwaterloo.ca/~gvcormac/cormacksigir09-rrf.pdf", kind: primary, vendor: false}
+- {id: s27, title: "Why RAG Complexity Should Be Earned, Towards Data Science", url: "https://towardsdatascience.com/why-rag-complexity-should-be-earned/", kind: secondary, vendor: false}
+- {id: s28, title: "Anthropic: Building effective agents", url: "https://anthropic.com/engineering/building-effective-agents", kind: primary, vendor: true}
+- {id: s29, title: "Cognitive Architectures for Language Agents, arXiv 2309.02427", url: "https://arxiv.org/pdf/2309.02427", kind: primary, vendor: false}
+- {id: s30, title: "Memory for Autonomous LLM Agents: Mechanisms, Evaluation, and Emerging Frontiers, arXiv 2603.07670", url: "https://arxiv.org/abs/2603.07670", kind: primary, vendor: false, note: "Preprint survey."}
+- {id: s31, title: "Sophos: Operating inside the lethal trifecta", url: "https://www.sophos.com/en-us/blog/inside-the-lethal-trifecta-blast-radius-reduction-in-ai-agent-deployments", kind: secondary, vendor: true}
+- {id: s32, title: "Anthropic: Demystifying evals for AI agents", url: "https://anthropic.com/engineering/demystifying-evals-for-ai-agents", kind: primary, vendor: true}
+- {id: s33, title: "Design Patterns for Securing LLM Agents against Prompt Injections, arXiv 2506.08837", url: "https://arxiv.org/abs/2506.08837", kind: primary, vendor: false}
+- {id: s34, title: "Cloud Security Alliance: The OWASP Top 10 for LLM Applications 2026, what changed", url: "https://cloudsecurityalliance.org/articles/the-owasp-top-10-for-llm-applications-2026-what-changed-and-why-it-matters", kind: secondary, vendor: false}
+- {id: s35, title: "Chen and Guestrin: XGBoost, A Scalable Tree Boosting System, arXiv 1603.02754", url: "https://arxiv.org/abs/1603.02754", kind: primary, vendor: false, note: "KDD 2016."}

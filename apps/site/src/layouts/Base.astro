@@ -1,0 +1,77 @@
+---
+import "@fontsource-variable/overpass";
+import "@fontsource-variable/overpass-mono";
+import "../styles/theme.css";
+import Sidebar from "../components/Sidebar.astro";
+import Icon from "../components/Icon.astro";
+import { concepts } from "../data/curriculum.ts";
+import { guides } from "../guides/index.ts";
+
+interface Props { title: string; description: string; track?: string; current?: string; tab: "learn" | "map" }
+const { title, description, track, current, tab } = Astro.props;
+const live = new Set(guides.map((g) => g.slug));
+const index = concepts.map((c) => ({ t: c.title, k: c.track, m: `${c.trackName}, ${c.stage}`, u: live.has(c.key) ? `/${c.track}/${c.key}/` : null, p: `/map/#${c.key}` }));
+const searchJson = JSON.stringify(index).replace(/</g, "\\u003c");
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <script is:inline>(function(){var r=document.documentElement;r.classList.add("js");try{var t=localStorage.getItem("sp-theme");if(t)r.dataset.theme=t;if(localStorage.getItem("sp-side")==="open")r.classList.add("side-open")}catch(e){}})();</script>
+  </head>
+  <body>
+    <header class="bar">
+      <button class="lines-btn" type="button" data-side-toggle aria-expanded="false" aria-controls="side"><Icon name="lines" /><span>Lines</span></button>
+      <a class="brand" href="/" aria-label="Signal Path, home">
+        <svg viewBox="0 0 28 28" aria-hidden="true"><path d="M4 21H10L18 7H24" fill="none" stroke="var(--data)" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="4.5" cy="21" r="3.4" fill="var(--card)" stroke="var(--ink)" stroke-width="2.2"/><circle cx="23.5" cy="7" r="3.4" fill="var(--card)" stroke="var(--ink)" stroke-width="2.2"/></svg>
+        <span>Signal Path</span>
+      </a>
+      <nav class="tabs" aria-label="Sections">
+        <a href="/" data-tab="learn" class:list={{ current: tab === "learn" }} aria-current={tab === "learn" ? "page" : undefined}>Learn</a>
+        <a href="/map/" data-tab="map" class:list={{ current: tab === "map" }} aria-current={tab === "map" ? "page" : undefined}>Map</a>
+      </nav>
+      <div class="search" role="search">
+        <label><Icon name="search" /><span class="vh">Search concepts</span><input type="search" id="guide-search" data-search placeholder="Search concepts" autocomplete="off" role="combobox" aria-expanded="false" aria-controls="search-results" /><kbd>⌘K</kbd></label>
+        <div class="results" id="search-results" role="listbox" hidden></div>
+        <script is:inline type="application/json" id="search-index" set:html={searchJson}></script>
+      </div>
+      <button class="icon-btn" type="button" data-theme-toggle aria-label="Switch between light and dark"><Icon name="moon" /></button>
+    </header>
+    <div class="shell">
+      <aside class="side" id="side" aria-label="Lines"><div class="side-in"><Sidebar current={current} /></div></aside>
+      <main class:list={[track ? `t-${track}` : undefined]}>
+        <slot />
+        <footer>Signal Path. Draft guides await review.</footer>
+      </main>
+    </div>
+    <script is:inline data-ui>(function(){
+var root=document.documentElement;
+document.querySelector("[data-theme-toggle]").addEventListener("click",function(){var dark=root.dataset.theme?root.dataset.theme==="dark":matchMedia("(prefers-color-scheme: dark)").matches;root.dataset.theme=dark?"light":"dark";try{localStorage.setItem("sp-theme",root.dataset.theme)}catch(e){}});
+var sb=document.querySelector("[data-side-toggle]");
+function side(open){root.classList.toggle("side-open",open);sb.setAttribute("aria-expanded",String(open));try{localStorage.setItem("sp-side",open?"open":"closed")}catch(e){}}
+sb.setAttribute("aria-expanded",String(root.classList.contains("side-open")));
+sb.addEventListener("click",function(){side(!root.classList.contains("side-open"))});
+var q=document.querySelector("[data-search]"),box=document.getElementById("search-results"),idx=JSON.parse(document.getElementById("search-index").textContent),sel=0,hits=[];
+function esc(s){return s.replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})}
+function render(){var v=q.value.trim().toLowerCase();if(!v){box.hidden=true;q.setAttribute("aria-expanded","false");return}
+hits=idx.filter(function(e){return(e.t+" "+e.m).toLowerCase().indexOf(v)>=0}).slice(0,12);sel=Math.min(sel,Math.max(0,hits.length-1));
+box.innerHTML=hits.length?hits.map(function(e,i){return '<a role="option" class="t-'+e.k+(i===sel?" sel":"")+'" href="'+(e.u||e.p)+'"><i class="rdot"></i><span>'+esc(e.t)+"</span><small>"+esc(e.m)+(e.u?"":", planned")+"</small></a>"}).join(""):'<span class="none">No concept matches.</span>';
+box.hidden=false;q.setAttribute("aria-expanded","true")}
+q.addEventListener("input",function(){sel=0;render()});
+q.addEventListener("keydown",function(e){if(e.key==="ArrowDown"){sel=Math.min(sel+1,hits.length-1);render();e.preventDefault()}else if(e.key==="ArrowUp"){sel=Math.max(sel-1,0);render();e.preventDefault()}else if(e.key==="Enter"){var h=hits[sel];if(h)location.href=h.u||h.p}else if(e.key==="Escape"){q.value="";render();q.blur()}});
+q.addEventListener("blur",function(){setTimeout(function(){box.hidden=true},150)});
+q.addEventListener("focus",render);
+document.addEventListener("keydown",function(e){if((e.metaKey||e.ctrlKey)&&e.key==="k"){e.preventDefault();q.focus();q.select()}});
+function marks(){var done=[];try{done=JSON.parse(localStorage.getItem("sp-done")||"[]")}catch(e){}
+document.querySelectorAll("[data-guide]").forEach(function(a){var on=done.indexOf(a.dataset.guide)>=0;a.classList.toggle("done",on);a.classList.toggle("read",on)});
+document.querySelectorAll("[data-done-count]").forEach(function(c){c.textContent=done.length})}
+marks();document.addEventListener("sp-done",marks);
+})();</script>
+  </body>
+</html>

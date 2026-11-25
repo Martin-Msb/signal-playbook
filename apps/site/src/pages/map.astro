@@ -1,0 +1,85 @@
+---
+import Base from "../layouts/Base.astro";
+import { guides } from "../guides/index.ts";
+import { loadLedger } from "../lib/ledger.ts";
+import { network } from "../lib/network.ts";
+import { tracks } from "../data/curriculum.ts";
+
+await loadLedger();
+const { svg, stations } = network(guides);
+const total = stations.length;
+const byKey = new Map(stations.map((s) => [s.key, s]));
+const index = JSON.stringify(Object.fromEntries(stations.map((s) => [s.key, s]))).replace(/</g, "\\u003c");
+---
+<Base title="Map · Signal Path" description="The whole curriculum on one map: the Data, AI and ML lines, with one stop per concept in teaching order." tab="map">
+  <div class="phead">
+    <div><h1>Map</h1><p class="gmeta" style="margin-top:8px"><span>{total} concepts</span><span>{guides.length} open</span><span>{total - guides.length} planned</span></p></div>
+    <div class="legend">
+      <span><svg width="22" height="22" aria-hidden="true"><circle cx="11" cy="11" r="7.5" fill="var(--card)" stroke="var(--ink)" stroke-width="3"/></svg>Open</span>
+      <span><svg width="22" height="22" aria-hidden="true"><circle cx="11" cy="11" r="8" fill="var(--data)" stroke="var(--ink)" stroke-width="2"/><path d="M7 11l3 3 5-5.5" stroke="var(--card)" stroke-width="2.4" fill="none"/></svg>Read</span>
+      <span><svg width="22" height="22" aria-hidden="true"><path d="M2 11H20" stroke="var(--data)" stroke-width="7" opacity=".28"/><circle cx="11" cy="11" r="3.5" fill="var(--card)" stroke="var(--data)" stroke-width="1.5"/></svg>Planned</span>
+      <span><svg width="22" height="22" aria-hidden="true"><rect x="5.5" y="5.5" width="11" height="11" rx="2" transform="rotate(45 11 11)" fill="var(--card)" stroke="var(--ink)" stroke-width="2.5"/></svg>Governance or security</span>
+      <span><svg width="26" height="22" aria-hidden="true"><circle cx="13" cy="11" r="10" fill="var(--data)" opacity=".28"/><circle cx="13" cy="11" r="5" fill="var(--card)" stroke="var(--ink)" stroke-width="2.5"/></svg>Last opened</span>
+      <span class="pill"><span data-done-count>0</span>&nbsp;of {guides.length} read</span>
+    </div>
+  </div>
+  <div class="mapgrid">
+    <div class="netwrap">
+      <div class="net" set:html={svg} />
+      <aside class="insp" aria-live="polite" data-insp hidden></aside>
+    </div>
+    <nav class="index" aria-label="All concepts by line">
+      <div class="seg" role="group" aria-label="Show">
+        <button type="button" data-show="open" aria-pressed="true">Open, {guides.length}</button>
+        <button type="button" data-show="all" aria-pressed="false">All, {total}</button>
+      </div>
+      {tracks.map((t) => (
+        <section class={`t-${t.key}`} data-line hidden={t.concepts.every((c) => !byKey.get(c.key)!.built)}>
+          <h2>{t.name} line</h2>
+          {t.stages.map((st) => (
+            <div data-stage hidden={st.concepts.every((c) => !byKey.get(c.key)!.built)}>
+              <h3>{st.name}</h3>
+              <ul>
+                {st.concepts.map((c) => { const s = byKey.get(c.key)!; return s.built
+                  ? <li><a href={s.url} data-idx={s.key} data-guide={s.key}><span>{s.title}</span><i aria-hidden="true"></i></a></li>
+                  : <li class="plan" hidden><span data-idx={s.key}><span>{s.title}</span></span></li>; })}
+              </ul>
+            </div>
+          ))}
+        </section>
+      ))}
+    </nav>
+  </div>
+  <script is:inline type="application/json" id="stations" set:html={index}></script>
+  <script is:inline data-map>(function(){
+var idx=JSON.parse(document.getElementById("stations").textContent),insp=document.querySelector("[data-insp]"),wrap=document.querySelector(".netwrap"),hideT=0;
+function esc(s){return s.replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})}
+var done=[];try{done=JSON.parse(localStorage.getItem("sp-done")||"[]")}catch(e){}
+var last=null;try{last=JSON.parse(localStorage.getItem("sp-last")||"null")}catch(e){}
+if(last&&last.id){var h=document.querySelector('.here[data-here="'+last.id+'"]');if(h)h.classList.add("on")}
+function list(label,a){return a.length?'<p><b>'+label+'</b> '+a.map(esc).join("; ")+'</p>':""}
+function card(id){var s=idx[id];if(!s)return;var read=done.indexOf(id)>=0,st=s.built?(read?"Read":"Open"):"Planned";
+insp.className="insp t-"+s.track;
+insp.innerHTML='<div class="row1"><span class="bd">'+esc(s.trackName)+'</span><span class="st">'+st+(s.built?", "+s.minutes+" min, "+s.steps+" stops":"")+'</span></div><h2>'+esc(s.title)+'</h2><p>'+esc(s.stage)+(s.control?", governance or security":"")+'</p><p class="und">'+esc(s.understands)+'</p>'+list("Builds on",s.buildsOn)+list("Unlocks",s.unlocks)}
+function place(el){insp.hidden=false;if(matchMedia("(max-width: 640px)").matches)return;var r=el.getBoundingClientRect(),w=wrap.getBoundingClientRect(),cw=insp.offsetWidth,ch=insp.offsetHeight;
+var x=r.left-w.left+r.width/2+18,y=r.top-w.top+r.height/2+18;if(x+cw>w.width-12)x=r.left-w.left-cw-6;if(y+ch>w.height-12)y=r.top-w.top-ch-6;insp.style.left=Math.max(12,x)+"px";insp.style.top=Math.max(12,y)+"px"}
+function each(keys,fn){keys.split(" ").forEach(function(k){if(!k)return;var e=document.querySelector('.net [data-stn="'+k+'"]');if(e)fn(e)})}
+function mark(id,on){document.querySelectorAll('[data-stn="'+id+'"],[data-idx="'+id+'"]').forEach(function(e){e.classList.toggle("hl",on)});
+var el=document.querySelector('.net [data-stn="'+id+'"]');if(!el)return;
+each(el.getAttribute("data-needs"),function(e){e.classList.toggle("need",on)});each(el.getAttribute("data-next"),function(e){e.classList.toggle("next",on)})}
+document.querySelectorAll(".net [data-stn]").forEach(function(el){var id=el.getAttribute("data-stn");
+function on(){clearTimeout(hideT);card(id);place(el);mark(id,true)}function off(){mark(id,false);hideT=setTimeout(function(){insp.hidden=true},200)}
+el.addEventListener("mouseenter",on);el.addEventListener("focus",on);el.addEventListener("mouseleave",off);el.addEventListener("blur",off)});
+document.querySelectorAll("[data-idx]").forEach(function(el){var id=el.getAttribute("data-idx");
+function on(){mark(id,true)}function off(){mark(id,false)}
+el.addEventListener("mouseenter",on);el.addEventListener("focus",on);el.addEventListener("mouseleave",off);el.addEventListener("blur",off)});
+function fromHash(){var id=location.hash.slice(1),el=document.querySelector('.net [data-stn="'+id+'"]');if(!el)return;
+if(!idx[id].built){var b=document.querySelector('[data-show="all"]');if(b)b.click()}
+card(id);place(el);mark(id,true);clearTimeout(hideT);hideT=setTimeout(function(){mark(id,false);insp.hidden=true},8000)}
+addEventListener("hashchange",fromHash);setTimeout(fromHash,0);
+document.querySelectorAll("[data-show]").forEach(function(b){b.addEventListener("click",function(){var all=b.dataset.show==="all";
+document.querySelectorAll("[data-show]").forEach(function(x){x.setAttribute("aria-pressed",String(x===b))});
+document.querySelectorAll(".index .plan").forEach(function(x){x.hidden=!all});
+document.querySelectorAll(".index [data-line],.index [data-stage]").forEach(function(sec){sec.hidden=!all&&!sec.querySelector("a")})})});
+})();</script>
+</Base>

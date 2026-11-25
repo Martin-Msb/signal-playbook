@@ -1,0 +1,4 @@
+sources:
+  - {id: gradient-boosting-s1, title: "XGBoost documentation: Monotonic constraints", url: "https://xgboost.readthedocs.io/en/stable/tutorials/monotonic.html", kind: primary, vendor: false}
+claims:
+  - {id: gradient-boosting-monotonic, class: A, sources: [gradient-boosting-s1], verified: "2026-11-25", text: "XGBoost can enforce monotonicity constraints on any features used in a boosted model."}

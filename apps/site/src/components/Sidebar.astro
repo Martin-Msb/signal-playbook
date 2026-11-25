@@ -1,0 +1,23 @@
+---
+import { tracks } from "../data/curriculum.ts";
+import { guides } from "../guides/index.ts";
+interface Props { current?: string }
+const { current } = Astro.props;
+const live = new Map(guides.map((g) => [g.slug, g]));
+const total = tracks.reduce((n, t) => n + t.concepts.length, 0);
+const has = (cs: { key: string }[]) => !!current && cs.some((c) => c.key === current);
+---
+<div class="side-head"><b>Lines</b><span><span data-done-count>0</span> of {guides.length} read, {total} concepts</span></div>
+{tracks.map((t) => (
+  <details class:list={["trk", `t-${t.key}`]} open={has(t.concepts)}>
+    <summary><i></i><span>{t.name}</span><small>{t.concepts.filter((c) => live.has(c.key)).length} of {t.concepts.length} open</small></summary>
+    {t.stages.map((s) => (
+      <details class="modx" open={has(s.concepts)}>
+        <summary><span>{s.name}</span><small>{s.concepts.filter((c) => live.has(c.key)).length} of {s.concepts.length}</small></summary>
+        {s.concepts.map((c) => live.has(c.key)
+          ? <a class:list={["g", { current: c.key === current }]} href={`/${c.track}/${c.key}/`} data-guide={c.key} aria-current={c.key === current ? "page" : undefined}><span>{c.title}</span></a>
+          : <a class="g plan" href={`/map/#${c.key}`} title="Planned. Opens its stop on the Map."><span>{c.title}</span></a>)}
+      </details>
+    ))}
+  </details>
+))}

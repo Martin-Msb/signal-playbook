@@ -1,0 +1,6 @@
+sources:
+  - {id: open-table-formats-s1, title: "Apache Iceberg documentation: Spark queries", url: "https://iceberg.apache.org/docs/latest/spark-queries/", kind: primary, vendor: false}
+  - {id: open-table-formats-s2, title: "Apache Iceberg documentation: Spark procedures", url: "https://iceberg.apache.org/docs/latest/spark-procedures/", kind: primary, vendor: false}
+claims:
+  - {id: open-table-formats-time-travel, class: B, sources: [open-table-formats-s1], verified: "2026-11-25", text: "Spark supports time travel on Iceberg tables in SQL queries, using TIMESTAMP AS OF or VERSION AS OF clauses."}
+  - {id: open-table-formats-rollback, class: B, sources: [open-table-formats-s2], verified: "2026-11-25", text: "Iceberg's rollback_to_snapshot procedure rolls a table back to a specific snapshot ID."}

@@ -1,0 +1,10 @@
+---
+import Base from "../layouts/Base.astro";
+import GuideView from "../components/Guide.astro";
+import { guides } from "../guides/index.ts";
+
+const guide = guides[0];
+---
+<Base title="Signal Path" description="Visual guides to data, AI and ML systems. Every idea is a diagram stepped through one change at a time." track={guide.track} current={guide.id} tab="learn">
+  <GuideView guide={guide} />
+</Base>

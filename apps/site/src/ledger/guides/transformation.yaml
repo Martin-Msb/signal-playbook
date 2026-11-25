@@ -1,0 +1,4 @@
+sources:
+  - {id: transformation-s1, title: "dbt documentation: Best practices for workflows", url: "https://docs.getdbt.com/best-practices/best-practice-workflows", kind: primary, vendor: true}
+claims:
+  - {id: transformation-version-control, class: B, sources: [transformation-s1], verified: "2026-11-25", text: "dbt's best practices state that all dbt projects should be managed in version control and that all code changes should be reviewed in a pull request before merging into the production branch."}

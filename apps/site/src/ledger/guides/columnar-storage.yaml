@@ -1,0 +1,19 @@
+sources:
+  - {id: columnar-storage-s1, title: "Apache Parquet documentation: Overview", url: "https://parquet.apache.org/docs/overview/", kind: primary, vendor: false}
+  - {id: columnar-storage-s2, title: "Apache Parquet documentation: Concepts", url: "https://parquet.apache.org/docs/concepts/", kind: primary, vendor: false}
+  - {id: columnar-storage-s3, title: "Apache Parquet documentation: File format", url: "https://parquet.apache.org/docs/file-format/", kind: primary, vendor: false}
+  - {id: columnar-storage-s4, title: "Apache Parquet documentation: Encodings", url: "https://parquet.apache.org/docs/file-format/data-pages/encodings/", kind: primary, vendor: false}
+  - {id: columnar-storage-s5, title: "Apache Parquet documentation: Compression", url: "https://parquet.apache.org/docs/file-format/data-pages/compression/", kind: primary, vendor: false}
+  - {id: columnar-storage-s6, title: "Apache Parquet documentation: Page index", url: "https://parquet.apache.org/docs/file-format/pageindex/", kind: primary, vendor: false}
+  - {id: columnar-storage-s7, title: "Apache Parquet format: parquet.thrift", url: "https://github.com/apache/parquet-format/blob/master/src/main/thrift/parquet.thrift", kind: primary, vendor: false}
+  - {id: columnar-storage-s8, title: "Apache Parquet documentation: Parquet modular encryption", url: "https://parquet.apache.org/docs/file-format/data-pages/encryption/", kind: primary, vendor: false}
+  - {id: columnar-storage-s9, title: "Apache Arrow documentation: Arrow columnar format", url: "https://arrow.apache.org/docs/format/Columnar.html", kind: primary, vendor: false}
+claims:
+  - {id: columnar-storage-definition, class: A, sources: [columnar-storage-s1], verified: "2026-11-25", text: "Apache Parquet is an open source, column-oriented data file format designed for efficient data storage and retrieval."}
+  - {id: columnar-storage-layout, class: A, sources: [columnar-storage-s2], verified: "2026-11-25", text: "A row group consists of a column chunk for each column in the dataset, and column chunks are divided into pages."}
+  - {id: columnar-storage-locations, class: A, sources: [columnar-storage-s2, columnar-storage-s3], verified: "2026-11-25", text: "Column chunks are contiguous in the file. The file metadata contains the start locations of all column chunks, and a reader first reads the metadata to find the column chunks it is interested in."}
+  - {id: columnar-storage-encodings, class: A, sources: [columnar-storage-s4], verified: "2026-11-25", text: "Parquet defines dictionary encoding and a hybrid of bit-packing and run-length encoding that stores repeated values more efficiently."}
+  - {id: columnar-storage-compression, class: A, sources: [columnar-storage-s5], verified: "2026-11-25", text: "Parquet allows the data inside dictionary pages and data pages to be compressed, with codecs that include Snappy, Gzip and Zstandard."}
+  - {id: columnar-storage-statistics, class: A, sources: [columnar-storage-s6, columnar-storage-s7], verified: "2026-11-25", text: "Parquet stores statistics, including lower and upper bound values, per row group and per page, and its column index gives direct access to pages based on their min and max values."}
+  - {id: columnar-storage-encryption, class: A, sources: [columnar-storage-s8], verified: "2026-11-25", text: "Parquet modular encryption allows different encryption keys for different columns and for the footer."}
+  - {id: columnar-storage-arrow, class: A, sources: [columnar-storage-s9], verified: "2026-11-25", text: "The Arrow columnar format includes a language-agnostic specification of an in-memory data structure."}

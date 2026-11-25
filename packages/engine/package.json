@@ -1,0 +1,12 @@
+{
+  "name": "@signal-path/engine",
+  "version": "2.0.1",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./runtime": "./src/runtime.ts"
+  },
+  "scripts": {
+    "test": "node --test \"test/*.test.ts\""
+  }
+}

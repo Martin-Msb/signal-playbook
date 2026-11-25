@@ -1,0 +1,142 @@
+- id: boosted-trees-default
+  text: "Gradient-boosted decision trees are the long-standing default for tabular prediction."
+  class: B
+  sources: [s8, s6]
+  verified: "2026-11-24"
+- id: tabpfn-synthetic-pretraining
+  text: "TabPFN models are pretrained only on synthetic tables sampled from a prior over structural causal models."
+  class: B
+  sources: [s3, s5]
+  verified: "2026-11-24"
+  flags: [vendor-stated]
+- id: pfn-in-context-forward-pass
+  text: "A prior-data fitted network predicts in a forward pass that takes the labelled rows and the query rows as context, with no fitting on the user's table."
+  class: A
+  sources: [s3, s7]
+  verified: "2026-11-24"
+- id: pfn-posterior-predictive
+  text: "A trained prior-data fitted network approximates the Bayesian posterior predictive distribution under the prior that generated its pretraining data."
+  class: A
+  sources: [s7]
+  verified: "2026-11-24"
+- id: tabpfn-context-cache
+  text: "Caching the representation of the labelled rows reduces the cost of repeat predictions."
+  class: B
+  sources: [s3]
+  verified: "2026-11-24"
+  flags: [vendor-reported]
+- id: tabpfn-ceiling-v2
+  text: "TabPFN v2 accepts up to 10,000 training rows and 500 features."
+  class: C
+  sources: [s6]
+  verified: "2026-11-24"
+  value: 10000
+  display: "10,000"
+- id: tabpfn-ceiling-v2-5
+  text: "TabPFN-2.5 is designed for up to 50,000 training rows."
+  class: C
+  sources: [s5]
+  verified: "2026-11-24"
+  flags: [vendor-stated]
+  value: 50000
+  display: "50,000"
+- id: tabpfn-ceiling-v3
+  text: "TabPFN-3 accepts up to 1,000,000 training rows and 2,000 columns."
+  class: C
+  sources: [s1, s3]
+  verified: "2026-11-24"
+  flags: [vendor-stated]
+  value: 1000000
+  display: "1,000,000"
+- id: tabpfn-ceiling-v3-5
+  text: "The default TabPFN-3.5 checkpoint accepts up to 1,000,000 rows and 20,000 features."
+  class: C
+  sources: [s2, s1]
+  verified: "2026-11-24"
+  flags: [vendor-stated]
+  value: 1000000
+  display: "1,000,000"
+- id: tabpfn-4-preview
+  text: "TabPFN-4 is a vendor preview that claims up to 10 million training rows. It is not released."
+  class: C
+  sources: [s4]
+  verified: "2026-11-24"
+  flags: [vendor-reported, unreleased]
+  value: 10000000
+  display: "10M claimed"
+- id: tabpfn-weights-licence
+  text: "Model weights from TabPFN-2.5 onward are released under non-commercial licences."
+  class: C
+  sources: [s2]
+  verified: "2026-11-24"
+- id: tabarena-trees-and-foundation-models
+  text: "TabArena v0.1 found gradient-boosted trees still strong contenders on practical datasets and foundation models strongest on smaller datasets."
+  class: B
+  sources: [s6]
+  verified: "2026-11-24"
+- id: tabular-fm-hardware-cost
+  text: "Zero-shot tabular foundation models carry a hardware cost that accuracy tables omit."
+  class: B
+  sources: [s8]
+  verified: "2026-11-24"
+- {id: etl-elt-definition, class: A, sources: [s10, s9], verified: "2026-11-24", text: "ETL transforms data before loading it. ELT loads the data first and transforms it inside the warehouse."}
+- {id: elt-raw-retained, class: B, sources: [s9], verified: "2026-11-24", flags: [vendor-stated], text: "ELT ingests data in its raw form."}
+- {id: elt-flexible, class: B, sources: [s10], verified: "2026-11-24", flags: [vendor-stated], text: "With the raw data in the warehouse, transformations can be changed and run again."}
+- {id: etl-before-load, class: B, sources: [s11, s12], verified: "2026-11-24", flags: [secondary-only], text: "ETL remains the choice where sensitive data must be masked or cleansed before it reaches storage, and many organisations run both patterns."}
+- {id: elt-cost-shift, class: B, sources: [s12], verified: "2026-11-24", flags: [secondary-only], text: "ELT moves transformation cost onto warehouse compute."}
+- {id: survey-warehouse-spend, class: C, sources: [s14], verified: "2026-11-24", flags: [vendor-reported], text: "57% of respondents to the dbt Labs 2026 survey report increased warehouse and compute spend."}
+- {id: survey-time-sinks, class: C, sources: [s13], verified: "2026-11-24", text: "In the 2026 State of Data Engineering Survey, 55.4% of 1,101 respondents name data modelling and transformation as a top time sink and 48.1% name ingestion and pipelines."}
+- {id: iceberg-metadata-tree, class: A, sources: [s15], verified: "2026-11-24", text: "An Iceberg snapshot is the state of a table at a point in time. A manifest list names the manifests of one snapshot, and each manifest lists data files."}
+- {id: iceberg-atomic-swap, class: A, sources: [s15, s16], verified: "2026-11-24", text: "Every change to table state writes a new metadata file and replaces the old one with an atomic swap."}
+- {id: iceberg-retry, class: A, sources: [s16], verified: "2026-11-24", text: "A writer whose swap fails because another writer committed retries against the new table state."}
+- {id: iceberg-reader-snapshot, class: A, sources: [s15], verified: "2026-11-24", text: "A reader uses the snapshot that was current when it loaded the table metadata."}
+- {id: iceberg-manifest-stats, class: A, sources: [s15], verified: "2026-11-24", text: "A manifest list stores partition statistics for each manifest, which lets a query skip manifests it does not need."}
+- {id: iceberg-snapshot-per-write, class: A, sources: [s16], verified: "2026-11-24", text: "Every write produces a new snapshot that reuses as much of the previous metadata tree as possible."}
+- {id: iceberg-v3-ga, class: C, sources: [s17], verified: "2026-11-24", text: "Snowflake made support for Apache Iceberg v3 generally available on 7 May 2026."}
+- {id: iceberg-v4-unreleased, class: C, sources: [s18], verified: "2026-11-24", flags: [secondary-only], text: "Iceberg v4 was not released as of June 2026."}
+- {id: dbt-model-select, class: A, sources: [s19], verified: "2026-11-24", text: "A dbt SQL model is a select statement in a .sql file. dbt wraps it in the DDL or DML for the warehouse."}
+- {id: dbt-runs-in-warehouse, class: A, sources: [s19], verified: "2026-11-24", text: "dbt runs SQL in the user's own warehouse. The data is not processed outside it."}
+- {id: dbt-ref-graph, class: A, sources: [s20, s21], verified: "2026-11-24", text: "ref() creates a dependency between models. dbt uses the references to build the dependency graph and run models in the correct order."}
+- {id: dbt-ref-environment, class: A, sources: [s20, s21], verified: "2026-11-24", text: "ref() resolves to the schema of the environment the project runs in."}
+- {id: dbt-skip-downstream, class: A, sources: [s19], verified: "2026-11-24", text: "When a model fails, dbt skips the models downstream of it."}
+- {id: dbt-materializations, class: C, sources: [s19], verified: "2026-11-24", text: "dbt ships five built-in materializations: view, table, incremental, ephemeral and materialized view."}
+- {id: dbt-ownership, class: C, sources: [s22], verified: "2026-11-24", text: "Fivetran completed its merger with dbt Labs on 1 June 2026. dbt Core v2.0 entered alpha under the Apache 2.0 licence."}
+- {id: context-rot, class: B, sources: [s23], verified: "2026-11-24", flags: [vendor-stated], text: "As the number of tokens in the context window grows, a model's ability to recall information from that context falls."}
+- {id: attention-budget, class: A, sources: [s23], verified: "2026-11-24", text: "Every token can attend to every other token, so n tokens create n squared pairwise relationships and added context has diminishing returns."}
+- {id: compaction, class: B, sources: [s23], verified: "2026-11-24", flags: [vendor-stated], text: "Compaction summarises a conversation that nears the context limit and continues in a new window with the summary."}
+- {id: note-taking, class: B, sources: [s23], verified: "2026-11-24", flags: [vendor-stated], text: "Structured note-taking writes state to storage outside the context window and reloads it later."}
+- {id: jit-retrieval, class: B, sources: [s23], verified: "2026-11-24", flags: [vendor-stated], text: "Just-in-time retrieval keeps lightweight references such as file paths and loads the content at runtime through tools."}
+- {id: sub-agents, class: B, sources: [s23], verified: "2026-11-24", flags: [vendor-stated], text: "A sub-agent works in its own clean context window and returns a condensed summary, often 1,000 to 2,000 tokens."}
+- {id: minimal-tools, class: B, sources: [s23], verified: "2026-11-24", flags: [vendor-stated], text: "A bloated tool set with overlapping tools is a common failure. A minimal set is easier to maintain and prune."}
+- {id: dense-sparse, class: A, sources: [s24], verified: "2026-11-24", text: "Sparse retrieval matches terms lexically, as BM25 does. Dense retrieval searches nearest neighbours over learned vectors."}
+- {id: bm25-exact-strings, class: B, sources: [s25], verified: "2026-11-24", flags: [vendor-stated], text: "BM25 finds an exact string such as an error code that an embedding model can miss."}
+- {id: rrf-formula, class: A, sources: [s26], verified: "2026-11-24", text: "Reciprocal rank fusion scores a document as the sum over rankings of 1 / (k + rank). The original paper fixed k at 60."}
+- {id: rerank-stage, class: B, sources: [s25], verified: "2026-11-24", flags: [vendor-stated], text: "A reranker rescores the merged candidates against the question so that a smaller set reaches the model."}
+- {id: contextual-retrieval-numbers, class: C, sources: [s25], verified: "2026-11-24", flags: [vendor-reported], text: "In Anthropic's benchmark, contextual embeddings with contextual BM25 cut the top-20 retrieval failure rate by 49%, and by 67% with reranking added."}
+- {id: rag-complexity-earned, class: B, sources: [s27], verified: "2026-11-24", flags: [secondary-only], text: "Hybrid retrieval with reranking is a strong baseline, and lexical retrieval stays competitive in specialised domains."}
+- {id: workflow-vs-agent, class: A, sources: [s28], verified: "2026-11-24", text: "A workflow runs models and tools through predefined code paths. An agent lets the model direct its own process and tool use."}
+- {id: agent-ground-truth, class: A, sources: [s28], verified: "2026-11-24", text: "At each step an agent uses feedback from the environment, such as tool results, to judge its progress."}
+- {id: agent-stopping, class: B, sources: [s28], verified: "2026-11-24", flags: [vendor-stated], text: "Agent tasks usually end on completion, and developers add limits such as a maximum number of iterations."}
+- {id: agent-compounding, class: B, sources: [s28], verified: "2026-11-24", flags: [vendor-stated], text: "Autonomy raises cost and lets errors compound across steps."}
+- {id: agent-start-simple, class: B, sources: [s28], verified: "2026-11-24", flags: [vendor-stated], text: "The simplest solution comes first. Agents suit open-ended problems where the number of steps cannot be predicted."}
+- {id: memory-stateless, class: A, sources: [s30], verified: "2026-11-24", text: "Memory turns a stateless model into an agent that accumulates knowledge, preferences and experience across interactions."}
+- {id: coala-memory-types, class: A, sources: [s29], verified: "2026-11-24", text: "CoALA separates a short-term working memory from three long-term memories: episodic, semantic and procedural."}
+- {id: coala-episodic-semantic, class: A, sources: [s29], verified: "2026-11-24", text: "Episodic memory stores experience from earlier decision cycles. Semantic memory stores the agent's knowledge about the world and itself."}
+- {id: memory-loop, class: A, sources: [s30], verified: "2026-11-24", text: "Agent memory is a write, manage, read loop coupled to perception and action."}
+- {id: memory-poisoning, class: B, sources: [s31], verified: "2026-11-24", flags: [secondary-only], text: "A poisoned memory entry loads in every later session, so memory writes are security events."}
+- {id: eval-terms, class: A, sources: [s32], verified: "2026-11-24", text: "A task is a single test with inputs and success criteria. A trial is one attempt at a task. A grader scores some part of the performance."}
+- {id: eval-outcome-transcript, class: A, sources: [s32], verified: "2026-11-24", text: "The transcript is the full record of a trial. The outcome is the final state of the environment, whatever the agent claims."}
+- {id: eval-grader-types, class: B, sources: [s32], verified: "2026-11-24", flags: [vendor-stated], text: "Code graders are fast and reproducible but brittle. Model graders handle nuance but need human calibration. Human graders are the reference and are slow and costly."}
+- {id: eval-pass-k, class: A, sources: [s32], verified: "2026-11-24", text: "pass@k is the chance that at least one of k trials succeeds. pass^k is the chance that all k succeed."}
+- {id: eval-capability-regression, class: B, sources: [s32], verified: "2026-11-24", flags: [vendor-stated], text: "Capability evals start at low pass rates. Regression evals sit near 100%, and mature capability evals graduate into them."}
+- {id: injection-definition, class: A, sources: [s33, s31], verified: "2026-11-24", text: "A prompt injection places adversarial instructions in content an agent reads, and the agent follows them with the user's privileges."}
+- {id: lethal-trifecta, class: B, sources: [s31], verified: "2026-11-24", flags: [secondary-only], text: "An agent that can read private data, process untrusted content and communicate externally is exposed to data theft through indirect prompt injection (Willison's lethal trifecta)."}
+- {id: rule-of-two, class: B, sources: [s31], verified: "2026-11-24", flags: [secondary-only], text: "The Agents Rule of Two: an agent should satisfy at most two of processing untrusted input, accessing sensitive systems and changing state externally."}
+- {id: filters-bypassed, class: B, sources: [s31], verified: "2026-11-24", flags: [secondary-only], text: "Adaptive attacks consistently bypass input filters and classifiers."}
+- {id: dual-llm, class: A, sources: [s33], verified: "2026-11-24", text: "In the dual LLM pattern a privileged model with tool access never reads untrusted data, and a quarantined model without tools processes it."}
+- {id: patterns-constrain, class: A, sources: [s33], verified: "2026-11-24", text: "The design patterns constrain what an agent can do, trading some utility for resistance to prompt injection."}
+- {id: owasp-2026-rank, class: C, sources: [s34], verified: "2026-11-24", flags: [secondary-only], text: "The OWASP Top 10 for LLM Applications 2026 ranks prompt injection first and excessive agency third."}
+- {id: boosting-additive, class: A, sources: [s35], verified: "2026-11-24", text: "A boosted tree ensemble predicts with the sum of K regression trees."}
+- {id: boosting-greedy-gradient, class: A, sources: [s35], verified: "2026-11-24", text: "Each new tree is added greedily to improve the objective given the current prediction, using the gradient of the loss with respect to that prediction."}
+- {id: boosting-shrinkage, class: A, sources: [s35], verified: "2026-11-24", text: "Shrinkage scales each newly added tree by a factor, which limits its influence and leaves room for later trees."}
+- {id: boosting-subsampling, class: B, sources: [s35], verified: "2026-11-24", text: "Column subsampling gives each tree a subset of the features and helps prevent overfitting."}

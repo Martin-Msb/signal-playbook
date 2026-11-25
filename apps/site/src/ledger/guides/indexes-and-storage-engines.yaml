@@ -1,0 +1,15 @@
+sources:
+  - {id: indexes-and-storage-engines-s1, title: "PostgreSQL documentation: Indexes, Introduction", url: "https://www.postgresql.org/docs/current/indexes-intro.html", kind: primary, vendor: false}
+  - {id: indexes-and-storage-engines-s2, title: "PostgreSQL documentation: Index types", url: "https://www.postgresql.org/docs/current/indexes-types.html", kind: primary, vendor: false}
+  - {id: indexes-and-storage-engines-s3, title: "PostgreSQL documentation: B-Tree indexes", url: "https://www.postgresql.org/docs/current/btree.html", kind: primary, vendor: false}
+  - {id: indexes-and-storage-engines-s4, title: "PostgreSQL documentation: Write-ahead logging", url: "https://www.postgresql.org/docs/current/wal-intro.html", kind: primary, vendor: false}
+  - {id: indexes-and-storage-engines-s5, title: "RocksDB wiki: RocksDB overview", url: "https://github.com/facebook/rocksdb/wiki/RocksDB-Overview", kind: primary, vendor: false}
+claims:
+  - {id: indexes-and-storage-engines-scan, class: A, sources: [indexes-and-storage-engines-s1], verified: "2026-11-25", text: "With no index, the system has to scan the entire table, row by row, to find all matching entries."}
+  - {id: indexes-and-storage-engines-cost, class: A, sources: [indexes-and-storage-engines-s1], verified: "2026-11-25", text: "An index makes locating matching rows more efficient and adds overhead to data manipulation operations, so indexes that are seldom or never used should be removed."}
+  - {id: indexes-and-storage-engines-btree, class: A, sources: [indexes-and-storage-engines-s2], verified: "2026-11-25", text: "B-trees can handle equality and range queries on data that can be sorted into some ordering."}
+  - {id: indexes-and-storage-engines-hash, class: A, sources: [indexes-and-storage-engines-s2], verified: "2026-11-25", text: "Hash indexes can only handle simple equality comparisons."}
+  - {id: indexes-and-storage-engines-pages, class: A, sources: [indexes-and-storage-engines-s3], verified: "2026-11-25", text: "PostgreSQL B-tree indexes are multi-level tree structures. Each leaf page contains tuples that point to table rows, and each internal page contains tuples that point to the next level down in the tree."}
+  - {id: indexes-and-storage-engines-wal, class: A, sources: [indexes-and-storage-engines-s4], verified: "2026-11-25", text: "Changes to data files must be written only after those changes have been logged, that is, after the log records describing them have been flushed to permanent storage."}
+  - {id: indexes-and-storage-engines-recovery, class: A, sources: [indexes-and-storage-engines-s4], verified: "2026-11-25", text: "After a crash the database can be recovered using the log: changes that have not been applied to the data pages are redone from the log records."}
+  - {id: indexes-and-storage-engines-lsm, class: A, sources: [indexes-and-storage-engines-s5], verified: "2026-11-25", text: "In RocksDB new writes are inserted into the memtable and are optionally written to a write-ahead log. When the memtable fills up it is flushed to a sorted file on storage, and background compaction merges files."}
