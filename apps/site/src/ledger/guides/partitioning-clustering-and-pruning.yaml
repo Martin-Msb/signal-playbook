@@ -1,0 +1,62 @@
+sources:
+  - id: partitioning-clustering-and-pruning-s1
+    title: "Apache Iceberg: Partitioning"
+    url: https://iceberg.apache.org/docs/latest/partitioning/
+    kind: primary
+    vendor: false
+  - id: partitioning-clustering-and-pruning-s2
+    title: "Apache Iceberg: Partition transforms specification"
+    url: https://iceberg.apache.org/spec/#partition-transforms
+    kind: primary
+    vendor: false
+  - id: partitioning-clustering-and-pruning-s3
+    title: "Apache Parquet: Page Index"
+    url: https://parquet.apache.org/docs/file-format/pageindex/
+    kind: primary
+    vendor: false
+  - id: partitioning-clustering-and-pruning-s4
+    title: "Google Cloud: Query partitioned tables"
+    url: https://cloud.google.com/bigquery/docs/querying-partitioned-tables
+    kind: primary
+    vendor: true
+  - id: partitioning-clustering-and-pruning-s5
+    title: "Google Cloud: Introduction to clustered tables"
+    url: https://cloud.google.com/bigquery/docs/clustered-tables
+    kind: primary
+    vendor: true
+  - id: partitioning-clustering-and-pruning-s6
+    title: "Google Cloud: Introduction to BigQuery row-level security"
+    url: https://cloud.google.com/bigquery/docs/row-level-security-intro
+    kind: primary
+    vendor: true
+claims:
+  - id: partitioning-clustering-and-pruning-partition-transform
+    class: A
+    sources: [partitioning-clustering-and-pruning-s1, partitioning-clustering-and-pruning-s2]
+    verified: "2026-11-25"
+    text: "Iceberg can transform timestamps to year, month, day or hour partitions. It tracks the relationship between a source column and its partition values, then derives partition filters from query predicates to skip files."
+  - id: partitioning-clustering-and-pruning-prune
+    class: A
+    sources: [partitioning-clustering-and-pruning-s1, partitioning-clustering-and-pruning-s4]
+    verified: "2026-11-25"
+    text: "A qualifying filter on a partition column can let a query scan matching partitions and skip the rest."
+  - id: partitioning-clustering-and-pruning-cluster
+    class: B
+    sources: [partitioning-clustering-and-pruning-s5]
+    verified: "2026-11-25"
+    text: "BigQuery sorts storage blocks by user-defined clustered columns. Filters on those columns can scan only relevant blocks, and column order determines precedence."
+  - id: partitioning-clustering-and-pruning-statistics
+    class: A
+    sources: [partitioning-clustering-and-pruning-s3, partitioning-clustering-and-pruning-s5]
+    verified: "2026-11-25"
+    text: "Parquet page indexes hold page statistics that can be used to skip pages. BigQuery uses block metadata and filter expressions to prune blocks that cannot contain matching values."
+  - id: partitioning-clustering-and-pruning-cost
+    class: B
+    sources: [partitioning-clustering-and-pruning-s4]
+    verified: "2026-11-25"
+    text: "BigQuery excludes pruned partitions from query byte-scan calculations, which can lower query cost."
+  - id: partitioning-clustering-and-pruning-access
+    class: B
+    sources: [partitioning-clustering-and-pruning-s6]
+    verified: "2026-11-25"
+    text: "BigQuery row-level access policies filter which table rows users can see; they are a separate access-control mechanism from partition pruning."

@@ -2,7 +2,7 @@ import type {
   ArrowEl, BlocksEl, BoxEl, Cell, CellsEl, CodeEl, DbEl, DocEl, DrumEl, El, Hue, Iso, LabelEl, LayersEl, LineEl, ListEl, ModelEl, NodeEl, PawnEl, PersonEl, PillEl, PlotEl, PrismEl, Pt, Ride,
   SeriesEl, SlabEl, Step, StepKind, StopEl, TableEl, TankEl, TreeEl, ZoneEl, Block,
 } from "./types.ts";
-import { cellsSize, codeHeight, listHeight, project, tableHeight } from "./render.ts";
+import { cellsSize, codeHeight, layerUnitPositions, listHeight, project, tableHeight } from "./render.ts";
 
 /** Authoring canvas for every scene. Lines run at 45 or 90 degrees. */
 export const CANVAS: [number, number] = [960, 540];
@@ -58,6 +58,8 @@ export function raise<T extends TableEl | CodeEl | ListEl | DocEl | TreeEl | Plo
 export const plot = (id: string, x: number, y: number, w: number, h: number, xr: [number, number], yr: [number, number], extra: X<PlotEl> = {}): PlotEl => ({ kind: "plot", id, x, y, w, h, xr, yr, ...extra });
 /** A series on a plot, in data units. `as` is line, points, area or bars. A record can ride a line series. */
 export const series = (id: string, plotId: string, as: "line" | "points" | "area" | "bars", pts: [number, number][], extra: X<SeriesEl> = {}): SeriesEl => ({ kind: "series", id, plot: plotId, as, pts, ...extra });
+/** A shaded rectangle on a plot, in data coordinates [xFrom, yFrom, xTo, yTo]. */
+export const shade = (id: string, plotId: string, region: [number, number, number, number], extra: X<SeriesEl> = {}): SeriesEl => ({ kind: "series", id, plot: plotId, as: "rect", region, ...extra });
 /** A shaded band between two values on an axis of a plot. */
 export const band = (id: string, plotId: string, from: number, to: number, extra: X<SeriesEl> = {}): SeriesEl => ({ kind: "series", id, plot: plotId, as: "band", at: [from, to], ...extra });
 /** A dashed line across a plot at one value: a threshold or a limit. */
@@ -70,6 +72,12 @@ export const blocks = (id: string, gx: number, gy: number, cols: number, size: n
 export const node = (id: string, x: number, y: number, label?: string, extra: X<NodeEl> = {}): NodeEl => ({ kind: "node", id, x, y, label, ...extra });
 /** A neural network card: sizes gives the units per layer. */
 export const layers = (id: string, x: number, y: number, w: number, h: number, sizes: number[], extra: X<LayersEl> = {}): LayersEl => ({ kind: "layers", id, x, y, w, h, sizes, ...extra });
+/** Connect two neural-network units as a drawable, rideable route. */
+export function layerConnection(id: string, network: LayersEl, from: [number, number], to: [number, number], extra: X<LineEl> = {}): LineEl {
+  const units = layerUnitPositions(network), a = units[from[0]]?.[from[1]], b = units[to[0]]?.[to[1]];
+  if (!a || !b) throw new RangeError(`layer connection ${id}: unit index is outside the network`);
+  return line(id, [a, b], extra);
+}
 
 export interface TreeSpec { label: string; sub?: string; hot?: boolean; mute?: boolean; hue?: Hue; tone?: "alert"; group?: string; kids?: TreeSpec[] }
 /**

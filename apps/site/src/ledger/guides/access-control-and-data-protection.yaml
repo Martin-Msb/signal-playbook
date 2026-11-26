@@ -1,0 +1,51 @@
+sources:
+  - {id: access-control-and-data-protection-s1, title: "AWS Lake Formation: Data filtering and cell-level security", url: "https://docs.aws.amazon.com/lake-formation/latest/dg/data-filtering.html", kind: primary, vendor: true}
+  - {id: access-control-and-data-protection-s2, title: "Google Cloud: Introduction to BigQuery row-level security", url: "https://cloud.google.com/bigquery/docs/row-level-security-intro", kind: primary, vendor: true}
+  - {id: access-control-and-data-protection-s3, title: "Google Cloud: Introduction to column-level access control", url: "https://cloud.google.com/bigquery/docs/column-level-security-intro", kind: primary, vendor: true}
+  - {id: access-control-and-data-protection-s4, title: "Apache Iceberg: REST Catalog Protocol", url: "https://iceberg.apache.org/docs/nightly/rest-protocol/", kind: primary, vendor: false}
+  - {id: access-control-and-data-protection-s5, title: "AWS KMS: Cryptography essentials", url: "https://docs.aws.amazon.com/kms/latest/developerguide/kms-cryptography.html", kind: primary, vendor: true}
+  - {id: access-control-and-data-protection-s6, title: "AWS Lake Formation: Logging API calls with AWS CloudTrail", url: "https://docs.aws.amazon.com/lake-formation/latest/dg/logging-using-cloudtrail.html", kind: primary, vendor: true}
+  - {id: access-control-and-data-protection-s7, title: "EUR-Lex: Regulation (EU) 2016/679, Article 32", url: "https://eur-lex.europa.eu/eli/reg/2016/679", kind: primary, vendor: false}
+  - {id: access-control-and-data-protection-s8, title: "AWS IAM: Define permissions based on attributes with ABAC authorization", url: "https://docs.aws.amazon.com/IAM/latest/UserGuide/introduction_attribute-based-access-control.html", kind: primary, vendor: true}
+  - {id: access-control-and-data-protection-s9, title: "NIST SP 800-53 Rev. 5.1: Security and Privacy Controls", url: "https://csrc.nist.gov/CSRC/media/Projects/risk-management/800-53%20Downloads/800-53r5/SP_800-53_v5_1-derived-OSCAL.pdf", kind: primary, vendor: false}
+claims:
+  - id: access-control-and-data-protection-filtering
+    class: B
+    sources: [access-control-and-data-protection-s1]
+    verified: "2026-11-25"
+    text: "Lake Formation data filters can restrict query results by columns, rows, or both, and apply when SELECT permission is granted."
+  - id: access-control-and-data-protection-policy-tags
+    class: B
+    sources: [access-control-and-data-protection-s2, access-control-and-data-protection-s3]
+    verified: "2026-11-25"
+    text: "BigQuery row policies filter rows using conditions for specified users or groups, while column policy tags are checked at query time and require both dataset permission and tag permission."
+  - id: access-control-and-data-protection-authorization
+    class: A
+    sources: [access-control-and-data-protection-s8]
+    verified: "2026-11-25"
+    text: "Role-based access control assigns permissions through job-function policies, while attribute-based access control can grant access when principal and resource attributes match."
+  - id: access-control-and-data-protection-credentials
+    class: B
+    sources: [access-control-and-data-protection-s4]
+    verified: "2026-11-25"
+    text: "The Iceberg REST protocol can return short-lived, table-scoped storage credentials so clients do not need long-lived storage credentials of their own."
+  - id: access-control-and-data-protection-envelope
+    class: A
+    sources: [access-control-and-data-protection-s5]
+    verified: "2026-11-25"
+    text: "Envelope encryption encrypts data with a data key, then encrypts that data key under another key."
+  - id: access-control-and-data-protection-audit
+    class: B
+    sources: [access-control-and-data-protection-s6]
+    verified: "2026-11-25"
+    text: "CloudTrail records Lake Formation API calls with information about the requested action, who made it, when it occurred, and additional details."
+  - id: access-control-and-data-protection-law
+    class: A
+    sources: [access-control-and-data-protection-s7]
+    verified: "2026-11-25"
+    text: "GDPR Article 32 calls for security measures appropriate to the risk, including encryption where appropriate, confidentiality, integrity, availability and resilience, and regular testing of security measures."
+  - id: access-control-and-data-protection-governance
+    class: A
+    sources: [access-control-and-data-protection-s9]
+    verified: "2026-11-25"
+    text: "NIST SP 800-53 AC-5 calls for access authorisations that support separation of duties, and AC-6 calls for least privilege limited to access necessary for assigned tasks."

@@ -1,0 +1,12 @@
+sources:
+  - {id: cost-and-workload-management-s1, title: "FinOps Foundation: FinOps Framework", url: "https://www.finops.org/framework/", kind: primary, vendor: false}
+  - {id: cost-and-workload-management-s2, title: "Google Cloud: Estimate and control costs", url: "https://docs.cloud.google.com/bigquery/docs/best-practices-costs", kind: primary, vendor: true}
+  - {id: cost-and-workload-management-s3, title: "Google Cloud: Understand reservations", url: "https://docs.cloud.google.com/bigquery/docs/reservations-workload-management", kind: primary, vendor: true}
+  - {id: cost-and-workload-management-s4, title: "Amazon S3: Lifecycle configuration elements", url: "https://docs.aws.amazon.com/AmazonS3/latest/userguide/intro-lifecycle-rules.html", kind: primary, vendor: true}
+claims:
+  - {id: cost-and-workload-management-finops, class: A, sources: [cost-and-workload-management-s1], verified: "2026-11-26", text: "FinOps is a collaborative operational framework and cultural practice that maximises technology business value and creates financial accountability."}
+  - {id: cost-and-workload-management-dry-run, class: A, sources: [cost-and-workload-management-s2], verified: "2026-11-26", text: "For on-demand BigQuery queries, a dry run estimates bytes processed; the estimate is an upper bound and can exceed bytes billed after execution."}
+  - {id: cost-and-workload-management-budget-control, class: A, sources: [cost-and-workload-management-s2], verified: "2026-11-26", text: "BigQuery maximum bytes billed can fail a query before execution when its estimated bytes exceed the configured limit."}
+  - {id: cost-and-workload-management-reservations, class: A, sources: [cost-and-workload-management-s3], verified: "2026-11-26", text: "BigQuery reservations allocate capacity between workloads, teams or departments, and provide isolated resource pools."}
+  - {id: cost-and-workload-management-autoscaling, class: B, sources: [cost-and-workload-management-s3], verified: "2026-11-26", text: "BigQuery autoscaling reservations add capacity in response to workload demand within configured reservation capacity."}
+  - {id: cost-and-workload-management-lifecycle, class: A, sources: [cost-and-workload-management-s4], verified: "2026-11-26", text: "Amazon S3 Lifecycle rules can transition objects between storage classes and expire objects; expiration behaviour depends on bucket versioning."}

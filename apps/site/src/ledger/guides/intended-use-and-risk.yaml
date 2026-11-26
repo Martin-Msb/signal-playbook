@@ -1,0 +1,8 @@
+sources:
+  - {id: intended-use-and-risk-s1, title: "NIST: AI RMF Playbook, Map function", url: "https://airc.nist.gov/airmf-resources/playbook/map/", kind: primary, vendor: false}
+  - {id: intended-use-and-risk-s2, title: "EUR-Lex: Artificial Intelligence Act, consolidated text", url: "https://eur-lex.europa.eu/eli/reg/2024/1689", kind: primary, vendor: false}
+claims:
+  - {id: intended-use-and-risk-context, class: A, sources: [intended-use-and-risk-s1], verified: "2026-11-26", text: "NIST says intended purpose, potentially beneficial uses, context-specific laws and norms, and prospective deployment settings should be understood and documented."}
+  - {id: intended-use-and-risk-impact, class: A, sources: [intended-use-and-risk-s1], verified: "2026-11-26", text: "NIST says likelihood and magnitude of each identified positive or harmful impact should be identified and documented based on expected use, past uses in similar contexts, public incident reports, feedback and other data."}
+  - {id: intended-use-and-risk-high-risk, class: C, sources: [intended-use-and-risk-s2], verified: "2026-11-26", text: "Under the EU AI Act, AI systems intended for recruitment or selection of natural persons, including analysing or filtering applications and evaluating candidates, are high-risk systems."}
+  - {id: intended-use-and-risk-management, class: A, sources: [intended-use-and-risk-s2], verified: "2026-11-26", text: "The EU AI Act requires a documented and maintained risk management system for high-risk AI systems, as a continuous iterative process throughout their lifecycle that considers intended purpose and reasonably foreseeable misuse."}

@@ -8,9 +8,12 @@ interface Payload {
   whatIf?: { step: number; from: number };
 }
 interface Tok { el: SVGGElement; path: SVGPathElement | null; from: number; to: number; via: number[]; label: string; then?: string; rest: [number, number] }
+interface Segment { a: number; b: number; ms: number; dwell: number }
+interface Plan { t: Tok; segs: Segment[]; offset: number; duration: number }
 
 const reduced = () => typeof matchMedia === "function" && matchMedia("(prefers-reduced-motion: reduce)").matches;
 const ease = (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
+import { rideArrivalLabel, rideQueue } from "./motion.ts";
 
 class SpGuide extends HTMLElement {
   private i = -1;
@@ -179,7 +182,35 @@ class SpGuide extends HTMLElement {
 
   private rest(t: Tok) {
     t.el.setAttribute("transform", `translate(${t.rest[0]} ${t.rest[1]})`);
-    this.setLabel(t, t.then ?? t.label);
+    this.setLabel(t, rideArrivalLabel(t.label, t.then, true));
+  }
+
+  private plans(toks: Tok[]): Plan[] {
+    const raw = toks.map((t) => {
+      const stops = [t.from, ...t.via, t.to], len = t.path?.getTotalLength() ?? 0;
+      const segs: Segment[] = [];
+      for (let k = 0; k < stops.length - 1; k++) {
+        const px = Math.abs(stops[k + 1] - stops[k]) * len;
+        segs.push({ a: stops[k], b: stops[k + 1], ms: Math.max(380, px * 3.1), dwell: k < stops.length - 2 ? 520 : 0 });
+      }
+      return { t, segs, duration: 280 + segs.reduce((a, g) => a + g.ms + g.dwell, 0) };
+    });
+    const queue = rideQueue(raw.map((p) => p.duration));
+    return raw.map((p, i) => ({ ...p, offset: queue[i].offset }));
+  }
+
+  private placePlan(p: Plan, elapsed: number) {
+    const { t, segs } = p;
+    if (elapsed < 0) { this.place(t, t.from, t.label); return; }
+    if (elapsed < 280) { this.place(t, segs[0].a, t.label); return; }
+    let acc = 280;
+    for (const g of segs) {
+      if (elapsed < acc + g.ms) { this.place(t, g.a + (g.b - g.a) * ease((elapsed - acc) / g.ms), t.label); return; }
+      acc += g.ms;
+      if (elapsed < acc + g.dwell) { this.place(t, g.b, t.label); return; }
+      acc += g.dwell;
+    }
+    this.rest(t);
   }
 
   /** Changes the record's text and refits its body. */
@@ -210,33 +241,11 @@ class SpGuide extends HTMLElement {
     if (scrub) scrub.disabled = toks.length === 0;
     if (!toks.length) return;
     if (!animate || reduced()) { toks.forEach((t) => this.rest(t)); if (scrub) scrub.value = "1000"; return; }
-    const plans = toks.map((t) => {
-      const stops = [t.from, ...t.via, t.to];
-      const len = t.path?.getTotalLength() ?? 0;
-      const segs: { a: number; b: number; ms: number; dwell: number; label: string }[] = [];
-      for (let k = 0; k < stops.length - 1; k++) {
-        const px = Math.abs(stops[k + 1] - stops[k]) * len;
-        segs.push({ a: stops[k], b: stops[k + 1], ms: Math.max(380, px * 3.1), dwell: k < stops.length - 2 ? 520 : 0, label: k === 0 ? t.label : t.then ?? t.label });
-      }
-      if (segs.length === 1 && t.then) segs[0].label = t.label;
-      return { t, segs, total: 280 + segs.reduce((a, g) => a + g.ms + g.dwell, 0) };
-    });
-    const longest = Math.max(...plans.map((p) => p.total));
+    const plans = this.plans(toks), longest = plans.at(-1)!.offset + plans.at(-1)!.duration;
     const start = performance.now();
     const frame = (now: number) => {
       const el = now - start;
-      for (const { t, segs } of plans) {
-        let acc = 280;
-        if (el < acc) { this.place(t, segs[0].a, t.label); continue; }
-        let placed = false;
-        for (const g of segs) {
-          if (el < acc + g.ms) { this.place(t, g.a + (g.b - g.a) * ease((el - acc) / g.ms), g.label); placed = true; break; }
-          acc += g.ms;
-          if (el < acc + g.dwell) { this.place(t, g.b, g.label); placed = true; break; }
-          acc += g.dwell;
-        }
-        if (!placed) this.rest(t);
-      }
+      for (const p of plans) this.placePlan(p, el - p.offset);
       if (scrub) scrub.value = String(Math.round(Math.min(1, el / longest) * 1000));
       if (el < longest) this.raf = requestAnimationFrame(frame);
     };
@@ -247,12 +256,11 @@ class SpGuide extends HTMLElement {
   private scrub(v: number) {
     cancelAnimationFrame(this.raf);
     const s = this.wi && this.data.whatIf ? this.data.whatIf.step : this.i;
-    for (const t of this.tokens(s)) {
-      const f = t.from + (t.to - t.from) * v;
-      const turn = t.via.length ? t.via[0] : t.to;
-      const passed = (t.to >= t.from ? f >= turn : f <= turn) && v > 0.02;
-      if (v >= 0.999) this.rest(t); else this.place(t, f, passed && t.then ? t.then : t.label);
-    }
+    const plans = this.plans(this.tokens(s));
+    if (!plans.length) return;
+    const last = plans.at(-1)!;
+    const total = last.offset + last.duration, elapsed = Math.min(1, Math.max(0, v)) * total;
+    for (const p of plans) this.placePlan(p, elapsed - p.offset);
   }
 
   /* ---------- hover to inspect ---------- */

@@ -1,0 +1,14 @@
+sources:
+  - {id: language-models-s1, title: "Brown et al.: Language Models are Few-Shot Learners", url: "https://arxiv.org/abs/2005.14165", kind: primary, vendor: false}
+  - {id: language-models-s2, title: "OpenAI: Text generation", url: "https://developers.openai.com/api/docs/guides/text", kind: primary, vendor: true}
+  - {id: language-models-s3, title: "Meta: Introducing Llama 3.1", url: "https://ai.meta.com/blog/meta-llama-3-1/", kind: primary, vendor: true}
+  - {id: language-models-s4, title: "European Union: Artificial Intelligence Act, consolidated text", url: "https://eur-lex.europa.eu/eli/reg/2024/1689/2026-07-27/eng", kind: primary, vendor: false}
+claims:
+  - {id: language-models-pretraining, class: A, sources: [language-models-s1], verified: "2026-11-26", text: "The GPT-3 study describes pre-training a language model on a large corpus of text, then using it for tasks through text interaction."}
+  - {id: language-models-next-piece, class: A, sources: [language-models-s1], verified: "2026-11-26", text: "An autoregressive language model conditions on preceding text and performs a task by predicting what comes next."}
+  - {id: language-models-in-context, class: A, sources: [language-models-s1], verified: "2026-11-26", text: "In the GPT-3 study, tasks and demonstrations were specified through text without gradient updates or fine-tuning at test time."}
+  - {id: language-models-multiple-tasks, class: A, sources: [language-models-s1], verified: "2026-11-26", text: "The GPT-3 study evaluated tasks including translation, question answering and text completion."}
+  - {id: language-models-limits, class: A, sources: [language-models-s1], verified: "2026-11-26", text: "The GPT-3 study reports tasks on which few-shot performance struggled and discusses limitations of the model."}
+  - {id: language-models-api, class: B, sources: [language-models-s2], verified: "2026-11-26", text: "OpenAI documents using a large language model to generate text from a prompt through its API and describes the same kind of use through ChatGPT."}
+  - {id: language-models-open-weights, class: B, sources: [language-models-s3], verified: "2026-11-26", text: "Meta describes Llama 3.1 models as openly available, downloadable by the community and available through partner platforms."}
+  - {id: language-models-purpose, class: A, sources: [language-models-s4], verified: "2026-11-26", text: "The EU AI Act defines a general-purpose AI model by its capacity to perform a wide range of tasks and integrate into downstream systems, and separately defines a provider and a deployer. Vinterhus should specify the assistant's intended task and operating controls and identify the team accountable for its deployment."}

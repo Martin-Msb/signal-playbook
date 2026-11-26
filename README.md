@@ -91,11 +91,11 @@ Name plates sit on one side of an object through `at`: n, s, e, w, sw or se. Cho
 
 | Element | Draws |
 | --- | --- |
-| `blocks` | A row or grid of small blocks on the floor, one per value or unit: file chunks, shards, a histogram. Height and hue carry meaning. |
+| `blocks` | A row or grid of small blocks on the floor, one per value or unit: file chunks, shards, a histogram. Height, hue, short labels and alert state carry meaning. |
 | `cells` | A strip or grid of labelled cells: tokens, log entries, rows. |
-| `plot` with `series`, `band`, `rule` | A chart card with axes in data units. Each series is its own element, so a step can reveal it. A record can ride a line series. |
+| `plot` with `series`, `band`, `rule`, `shade` | A chart card with axes in data units. Each series is its own element, so a step can reveal it. A record can ride a line series. |
 | `node`, `treeOf` | Nodes of a tree or graph joined by thin lines. `treeOf` lays out a tree. |
-| `layers` | A neural network as columns of units with weighted connections. |
+| `layers` | A neural network as columns of units with weighted connections. `layerUnitPositions` exposes unit positions; `layerConnection` draws a named route that a record can ride. |
 
 ### Cards and flat elements
 
@@ -107,7 +107,7 @@ Name plates sit on one side of an object through `at`: n, s, e, w, sw or se. Cho
 
 ### Rides and what-if
 
-A step's `rides` move a record along a rail from one stop or fraction to another. `via` stops are pauses and `then` is the record's text after the first pause. On the floor the record is a puck with its value on a label above it. The scene renders the record at rest, so the page is complete without script and under reduced motion.
+A step's `rides` move a record along a rail from one stop or fraction to another. `via` stops are pauses and `then` is the record's text after it arrives. Multiple rides in a step take turns in source order. On the floor the record is a puck with its value on a label above it. The scene renders the record at rest, so the page is complete without script and under reduced motion.
 
 `whatIf` on a guide names an earlier step to show as a counterfactual and the step from which the switch is offered.
 

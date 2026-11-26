@@ -289,12 +289,19 @@ function table(el: TableEl, uid = "", iso = false): string {
     const r = rowOf(raw), top = el.y + 28 + j * rh;
     const tip = r.cells.map((v, i) => `${el.cols[i]} ${v}`).join(" · ");
     s += `<g data-tip="${esc(tip)}">`;
-    if (r.hot) s += `<rect x="${el.x + 3}" y="${top + 2}" width="${el.w - 6}" height="${rh - 4}" rx="5" fill="${el.tone === "alert" ? "var(--alert)" : "var(--tc)"}"/>`;
+    if (r.hot || r.hue) s += `<rect x="${el.x + 3}" y="${top + 2}" width="${el.w - 6}" height="${rh - 4}" rx="5" fill="${r.hot ? (el.tone === "alert" ? "var(--alert)" : "var(--tc)") : M(r.hue!, "t")}"/>`;
     else {
       s += `<rect x="${el.x + 3}" y="${top}" width="${el.w - 6}" height="${rh}" fill="transparent"/>`;
       if (j < el.rows.length - 1) s += `<path d="M${el.x + 10} ${top + rh}H${el.x + el.w - 10}" stroke="var(--rule)" stroke-width="1.5"/>`;
     }
-    s += r.cells.map((v, i) => text(xs[i], top + rh / 2 + 4.5, v, { size: 12, w: r.hot ? 700 : 500, mono: true, fill: r.hot ? "var(--card)" : r.strike ? "var(--muted)" : r.mute ? "var(--faint)" : "var(--ink)", strike: r.strike })).join("");
+    s += r.cells.map((v, i) => {
+      const left = i === 0 ? el.x + 3 : (xs[i - 1] + xs[i]) / 2;
+      const right = i === r.cells.length - 1 ? el.x + el.w - 3 : (xs[i] + xs[i + 1]) / 2;
+      const colHue = !r.hot && !r.hue ? el.columnHues?.[i] : undefined;
+      const reverse = r.hot || r.hue === "ink" || colHue === "ink" || colHue === "track";
+      const cellFill = colHue ? `<rect x="${r1(left)}" y="${top + 1}" width="${r1(right - left)}" height="${rh - 2}" fill="${M(colHue, "t")}"/>` : "";
+      return cellFill + text(xs[i], top + rh / 2 + 4.5, v, { size: 12, w: r.hot ? 700 : 500, mono: true, fill: reverse ? "var(--card)" : r.strike ? "var(--muted)" : r.mute ? "var(--faint)" : "var(--ink)", strike: r.strike });
+    }).join("");
     s += `</g>`;
   });
   if (el.foot) s += text(xs[0], el.y + h - 9, el.foot, { size: 11, mono: true, fill: "var(--faint)" });
@@ -510,7 +517,7 @@ function prismCorners(el: { gx: number; gy: number; w: number; d: number; h: num
 const prismBox = (c: ReturnType<typeof prismCorners>) => ({ x0: c.D[0], y0: c.A[1], x1: c.B[0], y1: c.C0[1] });
 
 function prism(el: PrismEl, o: Iso, uid: string): string {
-  const c = prismCorners(el, o), hue = el.hue ?? "paper", closed = el.state === "closed";
+  const c = prismCorners(el, o), hue = el.hue ?? "paper", closed = el.state === "closed", alert = el.state === "alert";
   const mid: Pt = [(c.A[0] + c.C[0]) / 2, (c.A[1] + c.C[1]) / 2];
   const gs = Math.min(28, el.w * o.a * 0.8, el.d * o.a * 0.8);
   let s: string;
@@ -519,12 +526,12 @@ function prism(el: PrismEl, o: Iso, uid: string): string {
     s = `<polygon points="${pts([c.A, c.B, c.C, c.D])}"${dash}/><polygon points="${pts([c.D, c.C, c.C0, c.D0])}"${dash}/><polygon points="${pts([c.B, c.C, c.C0, c.B0])}"${dash}/>`
       + (el.title ? glyph("x", mid[0] - gs / 2, mid[1] - gs / 2, gs, "var(--faint)", 2.4) : "");
   } else {
-    s = shadow([c.D0, c.C0, c.B0, c.A0], uid) + face([c.D, c.C, c.C0, c.D0], M(hue, "l")) + face([c.B, c.C, c.C0, c.B0], M(hue, "r")) + face([c.A, c.B, c.C, c.D], M(hue, "t"))
+    s = shadow([c.D0, c.C0, c.B0, c.A0], uid) + face([c.D, c.C, c.C0, c.D0], alert ? "var(--alert)" : M(hue, "l")) + face([c.B, c.C, c.C0, c.B0], alert ? "var(--alert)" : M(hue, "r")) + face([c.A, c.B, c.C, c.D], alert ? "var(--aw)" : M(hue, "t"))
       + `<polyline points="${pts([[c.D[0] + 5, c.D[1] + 1.5], [c.A[0], c.A[1] + 4], [c.B[0] - 5, c.B[1] + 1.5]])}" fill="none" stroke="var(--glint)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>`
       + (el.glyph ? glyph(el.glyph, mid[0] - gs / 2, mid[1] - gs / 2, gs, hue === "ink" ? "var(--card)" : "var(--ink)", 2.2) : "");
   }
   if (el.title) {
-    const [x, y, po] = plateAt(el.at ?? "s", prismBox(c), el.title, { sub: closed ? el.sub ?? "closed" : el.sub, tone: closed ? "muted" : "ink", strike: closed });
+    const [x, y, po] = plateAt(el.at ?? "s", prismBox(c), el.title, { sub: closed ? el.sub ?? "closed" : el.sub, tone: alert ? "alert" : closed ? "muted" : "ink", strike: closed });
     s += plate(x, y, el.title, po);
   }
   return s;
@@ -535,12 +542,12 @@ function drumGeo(el: DrumEl, o: Iso) {
   return { cx, cy, rx, ry, top: cy - el.h, box: { x0: cx - rx, y0: cy - el.h - ry, x1: cx + rx, y1: cy + ry } };
 }
 function drum(el: DrumEl, o: Iso, uid: string): string {
-  const g = drumGeo(el, o), hue = el.hue ?? "sky", { cx, cy, rx, ry, top } = g;
+  const g = drumGeo(el, o), hue = el.hue ?? "sky", { cx, cy, rx, ry, top } = g, stroke = el.state === "alert" ? "var(--alert)" : "var(--ink)";
   const ring = (y: number) => `<path d="M${r1(cx - rx)} ${r1(y)}A${r1(rx)} ${r1(ry)} 0 0 0 ${r1(cx + rx)} ${r1(y)}" fill="none" stroke="var(--ink)" stroke-width="1.5" opacity=".55"/>`;
   let s = `<ellipse cx="${r1(cx + 5)}" cy="${r1(cy + 8)}" rx="${r1(rx)}" ry="${r1(ry)}" fill="var(--shade)" filter="url(#${uid}-soft)"/>`
-    + `<path d="M${r1(cx - rx)} ${r1(top)}V${r1(cy)}A${r1(rx)} ${r1(ry)} 0 0 0 ${r1(cx + rx)} ${r1(cy)}V${r1(top)}Z" fill="url(#${uid}-cyl-${hue})" stroke="var(--ink)" stroke-width="2.25" stroke-linejoin="round"/>`
+    + `<path d="M${r1(cx - rx)} ${r1(top)}V${r1(cy)}A${r1(rx)} ${r1(ry)} 0 0 0 ${r1(cx + rx)} ${r1(cy)}V${r1(top)}Z" fill="${el.state === "alert" ? "var(--aw)" : `url(#${uid}-cyl-${hue})`}" stroke="${stroke}" stroke-width="2.25" stroke-linejoin="round"/>`
     + ring(top + (cy - top) / 3) + ring(top + (2 * (cy - top)) / 3)
-    + `<ellipse cx="${r1(cx)}" cy="${r1(top)}" rx="${r1(rx)}" ry="${r1(ry)}" fill="${M(hue, "t")}" stroke="var(--ink)" stroke-width="2.25"/>`
+    + `<ellipse cx="${r1(cx)}" cy="${r1(top)}" rx="${r1(rx)}" ry="${r1(ry)}" fill="${el.state === "alert" ? "var(--alert)" : M(hue, "t")}" stroke="${stroke}" stroke-width="2.25"/>`
     + `<path d="M${r1(cx - rx + 7)} ${r1(top - 1)}A${r1(rx - 7)} ${r1(ry - 3.5)} 0 0 1 ${r1(cx)} ${r1(top - ry + 3.5)}" fill="none" stroke="var(--glint)" stroke-width="2" stroke-linecap="round"/>`
     + (el.glyph ? glyph(el.glyph, cx - 11, top - 11, 22, "var(--ink)", 2.2) : "");
   if (el.title) { const [x, y, po] = plateAt(el.at ?? "s", g.box, el.title, { sub: el.sub }); s += plate(x, y, el.title, po); }
@@ -679,6 +686,13 @@ function series(el: SeriesEl, p: PlotEl | undefined, uid: string): string {
     const r = el.axis === "y" ? [x0, Math.min(ay, by), x1 - x0, Math.abs(by - ay)] : [Math.min(ax, bx), y1, Math.abs(bx - ax), y0 - y1];
     s = `<rect x="${r1(r[0])}" y="${r1(r[1])}" width="${r1(r[2])}" height="${r1(r[3])}" fill="${col}" opacity=".14"/>`;
     anchor = [r[0] + 2, r[1] + 20];
+  } else if (el.as === "rect") {
+    const [xf, yf, xt, yt] = el.region ?? [0, 0, 0, 0];
+    const [xa, ya] = plotPoint(p, xf, yf), [xb, yb] = plotPoint(p, xt, yt);
+    const left = Math.max(x0, Math.min(xa, xb)), right = Math.min(x1, Math.max(xa, xb));
+    const top = Math.max(y1, Math.min(ya, yb)), bottom = Math.min(y0, Math.max(ya, yb));
+    s = `<rect x="${r1(left)}" y="${r1(top)}" width="${r1(Math.max(0, right - left))}" height="${r1(Math.max(0, bottom - top))}" fill="${col}" opacity=".18"/>`;
+    anchor = [left + 2, top + 20];
   } else {
     const v = Array.isArray(el.at) ? el.at[0] : el.at ?? 0, [vx, vy] = plotPoint(p, v, v);
     s = el.axis === "y" ? `<path d="M${r1(x0)} ${r1(vy)}H${r1(x1)}" stroke="${col}" stroke-width="${el.w ?? 2.5}" stroke-dasharray="6 5"/>` : `<path d="M${r1(vx)} ${r1(y0)}V${r1(y1)}" stroke="${col}" stroke-width="${el.w ?? 2.5}" stroke-dasharray="6 5"/>`;
@@ -719,7 +733,7 @@ function blockCells(el: BlocksEl) {
   }).sort((a, b) => a.gx + a.gy - (b.gx + b.gy));
 }
 const blockPrism = (el: BlocksEl, c: ReturnType<typeof blockCells>[number]): PrismEl =>
-  ({ kind: "prism", id: el.id, gx: c.gx, gy: c.gy, w: el.size, d: el.size, h: Math.max(2, c.it.h), hue: c.it.hot ? "track" : c.it.hue ?? "paper", state: c.it.state, z: el.z });
+  ({ kind: "prism", id: el.id, gx: c.gx, gy: c.gy, w: el.size, d: el.size, h: Math.max(2, c.it.h), hue: c.it.hot ? "track" : c.it.hue ?? "paper", state: c.it.state, title: c.it.label, at: el.at, z: el.z });
 function blocksBox(el: BlocksEl, o: Iso) {
   const bs = blockCells(el).map((c) => prismBox(prismCorners(blockPrism(el, c), o)));
   return { x0: Math.min(...bs.map((b) => b.x0)), y0: Math.min(...bs.map((b) => b.y0)), x1: Math.max(...bs.map((b) => b.x1)), y1: Math.max(...bs.map((b) => b.y1)) };
@@ -755,7 +769,7 @@ function node(el: NodeEl): string {
 }
 
 /** Centre of every unit of a layers element, layer by layer. */
-function layerUnits(el: LayersEl): Pt[][] {
+export function layerUnitPositions(el: LayersEl): Pt[][] {
   const n = el.sizes.length, top = el.y + 18, bottom = el.y + el.h - (el.labels ? 30 : 16);
   return el.sizes.map((k, i) => {
     const x = el.x + 28 + (n > 1 ? (i * (el.w - 56)) / (n - 1) : (el.w - 56) / 2);
@@ -763,15 +777,18 @@ function layerUnits(el: LayersEl): Pt[][] {
   });
 }
 function layers(el: LayersEl, uid: string, iso: boolean): string {
-  const U = layerUnits(el), lit = new Set((el.hot ?? []).map(([a, b]) => `${a}.${b}`));
+  const U = layerUnitPositions(el), lit = new Set((el.hot ?? []).map(([a, b]) => `${a}.${b}`));
   let s = post(el.x, el.y, el.w, el.h, el.stand, uid) + (iso ? edge(el.x, el.y, el.w, el.h) : "") + cardHead(el.x, headY(el.y, el.h, el.below), el.w, el.title, el.sub)
     + `<rect x="${el.x}" y="${el.y}" width="${el.w}" height="${el.h}" rx="12" fill="var(--card)" stroke="var(--ink)" stroke-width="2.5"/>`;
   let dim = "", bright = "";
-  for (let i = 0; i < U.length - 1; i++) U[i].forEach((a, ai) => U[i + 1].forEach((b, bi) => {
-    const on = lit.has(`${i}.${ai}`) && lit.has(`${i + 1}.${bi}`), d = `M${r1(a[0])} ${r1(a[1])}L${r1(b[0])} ${r1(b[1])}`;
+  const links = el.connections ?? U.slice(0, -1).flatMap((col, i) => col.flatMap((_, ai) => U[i + 1].map((__, bi) => [i, ai, i + 1, bi] as [number, number, number, number])));
+  for (const [i, ai, j, bi] of links) {
+    const a = U[i]?.[ai], b = U[j]?.[bi];
+    if (!a || !b) continue;
+    const on = lit.has(`${i}.${ai}`) && lit.has(`${j}.${bi}`), d = `M${r1(a[0])} ${r1(a[1])}L${r1(b[0])} ${r1(b[1])}`;
     if (on) bright += `<path d="${d}" stroke="var(--tc)" stroke-width="2.5"/>`;
     else dim += `<path d="${d}" stroke="var(--ink)" stroke-width="1.25" opacity="${r1(0.1 + (((ai * 7 + bi * 13 + i * 5) % 9) / 9) * 0.3)}"/>`;
-  }));
+  }
   s += dim + bright;
   U.forEach((col, i) => {
     s += col.map(([x, y], j) => `<circle cx="${r1(x)}" cy="${r1(y)}" r="7.5" fill="${lit.has(`${i}.${j}`) ? "var(--tc)" : "var(--card)"}" stroke="var(--ink)" stroke-width="2.25"/>`).join("");
@@ -976,6 +993,7 @@ export function sceneWarnings(guide: Guide): string[] {
       case "series": {
         const p = plotOf(guide.scene.els, el);
         if (!p) { out.push(`${guide.id} ${el.id}: series names plot ${el.plot}, which does not exist`); break; }
+        if (el.as === "rect" && (!el.region || el.region.some((v) => !Number.isFinite(v)))) out.push(`${guide.id} ${el.id}: a rect series needs four finite data coordinates`);
         for (const [a, b] of el.pts ?? []) if (a < Math.min(...p.xr) || a > Math.max(...p.xr) || b < Math.min(...p.yr) || b > Math.max(...p.yr)) { out.push(`${guide.id} ${el.id}: point ${a},${b} is outside the axes of ${p.id}`); break; }
         if ((el.as === "line" || el.as === "area") && (el.pts?.length ?? 0) < 2) out.push(`${guide.id} ${el.id}: a ${el.as} series needs at least two points`);
         break;
@@ -988,6 +1006,7 @@ export function sceneWarnings(guide: Guide): string[] {
         break;
       }
       case "layers":
+        for (const [a, b, c, d] of el.connections ?? []) if (!el.sizes[a] || !el.sizes[c] || b >= el.sizes[a] || d >= el.sizes[c]) out.push(`${guide.id} ${el.id}: connection ${a}.${b} to ${c}.${d} uses a missing unit`);
         inside(el.id, el.x, el.y - (el.title && !el.below ? 26 : 0), el.x + el.w, el.y + el.h + (el.title && el.below ? 28 : 5));
         break;
       case "node": {
@@ -1092,7 +1111,16 @@ function boxesOf(el: El, o: Iso): Box[] {
     case "cells": { const [w, h] = cellsSize(el); return [{ name: id, own: id, x0: el.x, y0: el.y - (el.title && !el.below ? 24 : 0), x1: el.x + w, y1: el.y + h + 5 + (el.title && el.below ? 26 : 0) }]; }
     case "node": { if ((el.shape ?? "dot") === "dot") return []; const [w, h] = nodeSize(el); return [{ name: id, own: id, x0: el.x - w / 2, y0: el.y - h / 2, x1: el.x + w / 2, y1: el.y + h / 2 + 4 }]; }
     case "blocks": {
-      const b = blocksBox(el, o), out: Box[] = [{ name: id, own: id, vol: true, ...b }];
+      const out: Box[] = [];
+      blockCells(el).forEach((c, i) => {
+        const prismEl = blockPrism(el, c), b = prismBox(prismCorners(prismEl, o)), own = `${id}-block-${i}`;
+        out.push({ name: `${id} block ${i + 1}`, own, vol: true, ...b });
+        if (c.it.label) {
+          const [x, y, po] = plateAt(el.at ?? "s", b, c.it.label, { tone: c.it.state === "alert" ? "alert" : "ink" });
+          out.push(plateBox(`${id} block ${i + 1} plate`, own, x, y, c.it.label, po));
+        }
+      });
+      const b = blocksBox(el, o);
       if (el.title) { const [x, y, po] = plateAt(el.at ?? "s", b, el.title, { sub: el.sub, glyph: el.glyph }); out.push(plateBox(`${id} plate`, id, x, y, el.title, po)); }
       return out;
     }

@@ -5,19 +5,19 @@ import type { El, Hue, Pt } from "@signal-path/engine";
 // one block per field, one colour per field. Without a schema the rows are ragged and grey.
 // The schema stands on a card at the back. The check that applies it moves from the write side of the rail to the read side.
 const G = isoGrid(330, 30, 30);
-const R = 10.6, C = 18.8, SIZE = 1.5, FP = 2.2, RP = 1.9, H = 20;
+const R = 10.6, C = 18.2, SIZE = 1.5, FP = 2.2, RP = 1.75, H = 20;
 const FIELDS: { k: string; hue: Hue }[] = [{ k: "order", hue: "sand" }, { k: "channel", hue: "mint" }, { k: "email", hue: "rose" }, { k: "amount", hue: "sky" }];
-const X0 = 9, Y0 = 0;
-const S = { co: 3.3, w: 6.2, store: 13, r: 8.4, fin: 6, end: 3.4 };
+const X0 = 8.2, Y0 = 0;
+const S = { co: 3.3, w: 5.2, store: 12.4, r: 8.4, fin: 6.4, end: 3.4 };
 const up = (gx: number, gy: number, dy: number): Pt => [G.p(gx, gy)[0], G.p(gx, gy)[1] - dy];
 /** One value: the block of field f in record k. Each block is its own element, so labels and records can rest beside the rows. */
 const value = (id: string, k: number, f: number, group: string, extra: { hue?: Hue; hot?: boolean } = {}): El =>
-  blocks(id, X0 + k * RP, Y0 + f * FP, 1, SIZE, [{ h: H, ...extra }], { group });
+  blocks(id, X0 + k * RP, Y0 + f, 1, SIZE, [{ h: H, ...extra }], { group });
 /** One record of the dataset: one block per field, in the field's colour. */
 const record = (id: string, k: number, group: string, bad = false): El[] =>
-  FIELDS.map((fl, f) => value(`${id}-${fl.k}`, k, f, group, bad && f === 3 ? { hot: true } : { hue: fl.hue }));
+  FIELDS.map((fl, f) => value(`${id}-${fl.k}`, k, f * FP, group, bad && f === 3 ? { hot: true } : { hue: fl.hue }));
 /** A line of text: n unnamed values. */
-const grey = (id: string, k: number, n: number): El[] => Array.from({ length: n }, (_, f) => value(`${id}-${f}`, k, f * 0.77, "raw", { hue: "paper" }));
+const grey = (id: string, k: number, n: number): El[] => Array.from({ length: n }, (_, f) => value(`${id}-${f}`, k, f * 1.7, "raw", { hue: "paper" }));
 const CARD: Pt = [128, 516], SCHEMA: Pt = [822, 196];
 const card = (id: string, title: string, sub: string | undefined, order: string, amount: string, hot: boolean): El =>
   raise(table(id, 0, 0, 196, ["field", "value"], [["order", order], ["channel", "web"], ["email", "m.l@…"], { cells: ["amount", amount], hot }], { at: [12, 98], rowH: 24, title, sub, group: id }), CARD, 30);
@@ -40,12 +40,12 @@ export default defineGuide({
       stop("s-store", ...G.p(S.store, R), undefined, undefined, { always: true }),
       stop("s-fin", ...G.p(C, S.fin), undefined, undefined, { always: true }),
       prism("co", 0.6, R - 0.7, 1.4, 1.4, 30, { hue: "track", glyph: "pen", title: "Checkout", sub: "writes orders", at: "n", always: true }),
-      prism("fin-q", C - 0.7, S.end - 1.4, 1.4, 1.4, 30, { glyph: "chart", title: "Finance", sub: "which value is the amount?", at: "n", group: "raw" }),
-      prism("fin", C - 0.7, S.end - 1.4, 1.4, 1.4, 30, { glyph: "chart", title: "Finance", sub: "amount by channel", at: "n", group: "named" }),
+      prism("fin-q", C - 0.7, S.end - 1.4, 1.4, 1.4, 30, { glyph: "chart", title: "Finance", sub: "guesses the amount", at: "se", group: "raw" }),
+      prism("fin", C - 0.7, S.end - 1.4, 1.4, 1.4, 30, { glyph: "chart", title: "Finance", sub: "amount by channel", at: "se", group: "named" }),
 
       // 1. values without a schema: ragged, unnamed rows and a file of text lines
       ...grey("g0", 0, 4), ...grey("g1", 1, 3), ...grey("g2", 2, 5),
-      pill("raw-l", up(X0 - 1.2, Y0 + 0.75, 15), "orders, as text", { glyph: "file", anchor: "end", group: "raw" }),
+      pill("raw-l", up(X0 - 1.4, Y0 - 0.6, 22), "orders, as text", { glyph: "file", anchor: "end", group: "raw" }),
       raise(list("lines", 0, 0, 236, ["4468,store,a.k@…,129", "4469;349;store", "4470,web,m.l@…,1 290 kr,x"], { title: "orders.txt", sub: "no agreed shape", mono: true, group: "raw" }), [150, 512], 30),
 
       // 2 to 6. the dataset: one row of four typed blocks per record
@@ -62,13 +62,13 @@ export default defineGuide({
 
       // 4 and 5. where the schema is applied
       stop("s-w", ...G.p(S.w, R), undefined, undefined, { group: "wgate" }),
-      prism("wg", S.w - 0.6, R + 1.3, 1.2, 1.2, 24, { hue: "track", glyph: "check", title: "Schema check", sub: "on write", at: "s", group: "wgate" }),
+      prism("wg", S.w - 1.4, R + 1.6, 1.2, 1.2, 24, { hue: "track", glyph: "check", title: "Schema check", sub: "on write: error", at: "s", group: "wgate" }),
       stop("s-r", ...G.p(C, S.r), undefined, undefined, { group: "rgate" }),
-      prism("rg", C + 1.3, S.r - 0.6, 1.2, 1.2, 24, { hue: "track", glyph: "check", title: "Schema check", sub: "on read", at: "e", group: "rgate" }),
+      prism("rg", C + 1.9, S.r - 0.2, 1.2, 1.2, 24, { hue: "track", glyph: "check", title: "Schema check", sub: "on read", at: "e", group: "rgate" }),
 
       // 6. the label on the field decides what a reader receives
       stop("s-tag", ...G.p(C, S.r), undefined, undefined, { group: "gov" }),
-      prism("tag", C + 1.3, S.r - 0.6, 1.2, 1.2, 24, { hue: "rose", glyph: "lock", title: "Policy tag", sub: "email: personal", at: "e", group: "gov" }),
+      prism("tag", C + 1.9, S.r - 0.2, 1.2, 1.2, 24, { hue: "rose", glyph: "lock", title: "Policy tag", sub: "email: personal", at: "e", group: "gov" }),
     ],
   },
   steps: [
@@ -104,7 +104,7 @@ export default defineGuide({
       id: "write", label: "On write", kind: "mechanism", title: "Schema on write checks before storing",
       caption: "PostgreSQL and Delta Lake compare each incoming record with the schema. An amount that is text raises an error, and the record never lands.",
       show: ["named", "plain", "more", "schema", "wgate"], counters: ["4 named", "4 declared", "at write", "unlabelled"],
-      rides: [ride("rail", "s-co", "s-store", "4471", { via: ["s-w"] }), ride("rail", "s-co", "s-w", "\"n/a\" rejected", { tone: "alert" })],
+      rides: [ride("rail", "s-co", "s-store", "4471", { via: ["s-w"] }), ride("rail", "s-co", "s-w", "\"n/a\"", { tone: "alert" })],
       body: ["In PostgreSQL, data types limit the kind of data that can be stored in a table. If a user attempts to store data in a column that would violate a constraint, an error is raised.",
         "Delta Lake validates that the schema of the data being written is compatible with the schema of the table. Every written column must exist in the table and its data type must match, and a write that breaks either rule raises an exception.",
         "A data warehouse enforces structure as it ingests data. That approach is known as schema-on-write."],
@@ -114,7 +114,7 @@ export default defineGuide({
       id: "read", label: "On read", kind: "mechanism", title: "Schema on read checks at query time",
       caption: "The files are stored as they arrive. Amazon Athena keeps the schema in a catalogue and projects it onto the data when Finance runs a query.",
       show: ["named", "plain", "bad", "rec-kept", "schema", "rgate"], counters: ["4 named", "4 declared", "at read", "unlabelled"],
-      rides: [ride("rail", "s-co", "s-r", "amount \"n/a\"", { via: ["s-store"], tone: "alert" })],
+      rides: [ride("rail", "s-co", "s-r", "\"n/a\"", { via: ["s-store"], tone: "alert" })],
       body: ["Athena stores the schema in the AWS Glue Data Catalog and uses it to read the data when the table is queried. It does not modify the data in Amazon S3, and no loading or transformation is needed first.",
         "Data lakes keep data in its original state and apply transformation only when the data is needed. That approach is known as schema-on-read.",
         "Avro keeps both sides explicit: data is always read with the schema that wrote it present. When the reader expects a different schema, a field only the writer has is ignored, and a field only the reader has, with no default value, signals an error.",
@@ -125,7 +125,7 @@ export default defineGuide({
       id: "decide", label: "Decide", kind: "decision", title: "What the schema settles",
       caption: "",
       show: ["named", "more", "rec", "gov"], counters: ["4 named", "4 declared", "at write or at read", "email: personal"],
-      rides: [ride("rail", "s-store", "s-fin", "4 fields", { via: ["s-tag"], then: "email withheld" })],
+      rides: [ride("rail", "s-store", "s-fin", "4 fields", { via: ["s-tag"], then: "no email" })],
       body: [{ pair: {
         left: { label: "When to check", items: ["On write: bad records stopped early", "On read: raw data kept, schema per query"] },
         right: { label: "What to label", items: ["Sensitive fields, in the schema", "Access decided per field"] },

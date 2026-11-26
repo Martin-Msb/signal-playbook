@@ -1,0 +1,14 @@
+sources:
+  - {id: prompting-s1, title: "OpenAI: Prompt engineering", url: "https://developers.openai.com/api/docs/guides/prompt-engineering", kind: primary, vendor: true}
+  - {id: prompting-s2, title: "OpenAI: Text generation", url: "https://developers.openai.com/api/docs/guides/text", kind: primary, vendor: true}
+  - {id: prompting-s3, title: "Anthropic: Prompting best practices", url: "https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/claude-prompting-best-practices", kind: primary, vendor: true}
+  - {id: prompting-s4, title: "OWASP GenAI Security Project: LLM01:2026 Prompt Injection", url: "https://genai.owasp.org/llm2026/llm012026-prompt-injection/", kind: primary, vendor: false}
+claims:
+  - {id: prompting-instructions, class: A, sources: [prompting-s1], verified: "2026-11-26", text: "Prompt engineering is writing effective instructions for a model so it consistently generates content that meets requirements."}
+  - {id: prompting-message-roles, class: A, sources: [prompting-s1], verified: "2026-11-26", text: "OpenAI's API supports instructions and message roles with different priority levels, including developer instructions that take priority over user input."}
+  - {id: prompting-few-shot-examples, class: A, sources: [prompting-s1, prompting-s3], verified: "2026-11-26", text: "Few-shot prompting places input and output examples in the prompt to guide the model's output pattern; examples should be relevant and cover a range of possible inputs."}
+  - {id: prompting-prompt-structure, class: A, sources: [prompting-s1, prompting-s3], verified: "2026-11-26", text: "Markdown formatting and XML tags can separate instructions, examples, context and variable input in a prompt."}
+  - {id: prompting-prompt-boundary, class: A, sources: [prompting-s4], verified: "2026-11-26", text: "Models do not enforce an architectural trust boundary between instructions and data, so prompt content alone is not a security boundary."}
+  - {id: prompting-prompt-injection-risk, class: A, sources: [prompting-s4], verified: "2026-11-26", text: "Prompt injection occurs when input, including user text or retrieved content, changes a model's behaviour in ways the application developer did not intend."}
+  - {id: prompting-prompt-versioning, class: B, sources: [prompting-s2], verified: "2026-11-26", text: "OpenAI recommends keeping production prompt content in application code so it can be reviewed and versioned with the product."}
+  - {id: prompting-prompt-testing, class: B, sources: [prompting-s1, prompting-s2], verified: "2026-11-26", text: "OpenAI recommends tests and evaluation suites to measure prompt behaviour as prompts and model versions change."}

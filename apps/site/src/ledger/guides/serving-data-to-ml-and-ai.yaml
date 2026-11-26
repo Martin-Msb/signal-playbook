@@ -1,0 +1,72 @@
+sources:
+  - id: serving-data-to-ml-and-ai-s1
+    title: "Feast: Point-in-time joins"
+    url: "https://github.com/feast-dev/feast/blob/master/docs/getting-started/concepts/point-in-time-joins.md"
+    kind: primary
+    vendor: true
+  - id: serving-data-to-ml-and-ai-s2
+    title: "Feast: Feature retrieval"
+    url: "https://docs.feast.dev/getting-started/concepts/feature-retrieval"
+    kind: primary
+    vendor: true
+  - id: serving-data-to-ml-and-ai-s3
+    title: "Feast: Introduction"
+    url: "https://docs.feast.dev/"
+    kind: primary
+    vendor: true
+  - id: serving-data-to-ml-and-ai-s4
+    title: "Qdrant: Points"
+    url: "https://qdrant.tech/documentation/concepts/points/"
+    kind: primary
+    vendor: true
+  - id: serving-data-to-ml-and-ai-s5
+    title: "Qdrant: Filtering"
+    url: "https://qdrant.tech/documentation/search/filtering/"
+    kind: primary
+    vendor: true
+  - id: serving-data-to-ml-and-ai-s6
+    title: "Regulation (EU) 2016/679, Articles 17 and 19"
+    url: "https://eur-lex.europa.eu/eli/reg/2016/679/oj/eng/"
+    kind: primary
+    vendor: false
+claims:
+  - id: serving-data-to-ml-and-ai-historical-and-online-retrieval
+    class: A
+    sources: [serving-data-to-ml-and-ai-s2]
+    verified: "2026-11-26"
+    text: "Feast supports historical feature retrieval for training datasets and online feature retrieval for real-time inference."
+  - id: serving-data-to-ml-and-ai-point-in-time-join
+    class: A
+    sources: [serving-data-to-ml-and-ai-s1]
+    verified: "2026-11-26"
+    text: "A point-in-time join reproduces feature state at a past time, and created-timestamp filtering can exclude values unavailable at the entity timestamp."
+  - id: serving-data-to-ml-and-ai-offline-online-stores
+    class: A
+    sources: [serving-data-to-ml-and-ai-s3]
+    verified: "2026-11-26"
+    text: "Feast describes offline stores for historical feature extraction and online stores for low-latency production feature serving."
+  - id: serving-data-to-ml-and-ai-online-serving-push
+    class: A
+    sources: [serving-data-to-ml-and-ai-s3]
+    verified: "2026-11-26"
+    text: "Feast pushes feature values to the online store to reduce retrieval latency."
+  - id: serving-data-to-ml-and-ai-pipeline-keeps-features-current
+    class: A
+    sources: [serving-data-to-ml-and-ai-s3]
+    verified: "2026-11-26"
+    text: "Feast relies on upstream data pipelines to make feature values consistently available."
+  - id: serving-data-to-ml-and-ai-vector-record-updates
+    class: A
+    sources: [serving-data-to-ml-and-ai-s4]
+    verified: "2026-11-26"
+    text: "Qdrant points contain a vector and optional payload, and its point operations support inserting, updating and deleting records."
+  - id: serving-data-to-ml-and-ai-vector-filtering
+    class: A
+    sources: [serving-data-to-ml-and-ai-s5]
+    verified: "2026-11-26"
+    text: "Qdrant can apply payload and point identifier conditions when searching or retrieving points."
+  - id: serving-data-to-ml-and-ai-erasure-recipients
+    class: A
+    sources: [serving-data-to-ml-and-ai-s6]
+    verified: "2026-11-26"
+    text: "Under specified conditions, the GDPR requires controllers to communicate erasure to recipients and take reasonable steps concerning copies or replications of personal data."

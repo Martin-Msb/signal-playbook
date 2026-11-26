@@ -7,14 +7,14 @@ import type { El, Hue, Pt } from "@signal-path/engine";
 // Checkout writes on the left, Finance reads on the right, and a record rides the rail in front of the file.
 // The card on the left shows what is in the file. The card on the right shows what Finance knows about its shape.
 const G = isoGrid(480, 150, 30);
-const SIZE = 1.7, P = 2, RY = 11.2, RX = 12.4, W = 3 * P + SIZE;
+const SIZE = 1.7, P = 2, RY = 11.2, RX = 12, W = 3 * P + SIZE;
 const FIELDS: { k: string; hue: Hue }[] = [{ k: "order", hue: "sand" }, { k: "channel", hue: "mint" }, { k: "email", hue: "rose" }, { k: "amount", hue: "sky" }];
 const TEXT = 24, NAME = 14, BIN = 10;
 const up = (gx: number, gy: number, dy: number): Pt => [G.p(gx, gy)[0], G.p(gx, gy)[1] - dy];
 /** The file as a grid, one element per block so pills and records can sit close to it. byColumn swaps the two directions. */
 const grid = (id: string, h: number, group: string, o: { paper?: boolean; z?: number; byColumn?: boolean } = {}): El[] => [0, 1, 2, 3].flatMap((r) => FIELDS.map((f, c) =>
   blocks(`${id}-${r}${c}`, (o.byColumn ? r : c) * P, (o.byColumn ? c : r) * P, 1, SIZE, [{ h, hue: o.paper ? "paper" as Hue : f.hue }], { z: o.z, group })));
-const LEFT: Pt = [175, 185], RIGHT: Pt = [855, 150];
+const LEFT: Pt = [175, 185], RIGHT: Pt = [850, 175];
 const schema = (id: string, title: string, sub: string, items: string[], group: string): El => raise(list(id, 0, 0, 200, items, { title, sub, mono: true, rowH: 24, group }), RIGHT, 30);
 
 export default defineGuide({
@@ -48,10 +48,10 @@ export default defineGuide({
       ...grid("json", TEXT, "json", { z: NAME }),
       pill("names-l", [480, 52], "A name under every value", { to: up(SIZE, SIZE / 2, NAME / 2), group: "json" }),
       raise(code("f-json", 0, 0, 200, ["{\"order\": 4470,", " \"channel\": \"web\",", " \"email\": \"m.l@…\",", " \"amount\": 899}"], { title: "orders.json", sub: "text, one record", group: "json" }), LEFT, 30),
-      schema("k-json", "Finance reads", "from every record", ["order: number", "channel: string", "email: string", "amount: number"], "json"),
+      schema("k-json", "Finance reads", "per record", ["order: number", "channel: string", "email: string", "amount: number"], "json"),
 
       // 3. Avro: a header with the schema, then binary values
-      prism("hdr", 0, -2.2, 6.9, 1.5, 16, { hue: "track", glyph: "doc", title: "Header", sub: "schema, codec, sync marker", at: "n", group: "avro" }),
+      prism("hdr", 0, -2.2, 6.7, 1.5, 16, { hue: "track", glyph: "doc", title: "Header", sub: "schema, codec, sync marker", at: "n", group: "avro" }),
       ...grid("bin", BIN, "rowbin"),
       raise(cells("f-avro", 0, 0, 4, [58, 30], ["Obj1", { t: "schema", hot: true }, "codec", "sync"], { title: "orders.avro", sub: "header, then binary blocks", group: "avro" }), LEFT, 30),
       schema("k-avro", "Schema", "from the file header", ["order: int", "channel: string", "email: string", "amount: int"], "avro"),
@@ -59,7 +59,7 @@ export default defineGuide({
       // 4. Protobuf: field numbers in the bytes, the schema in a file both sides hold
       blocks("new", 4 * P, 3 * P, 1, SIZE, [{ h: BIN, hue: "violet", hot: true }], { group: "pb" }),
       ...[1, 2, 3, 4, 5].map((n, i) => pill(`n-${n}`, up(i * P + SIZE / 2, -1.7, 4), String(n), { mono: true, group: "pb" })),
-      pill("n-l", up(-0.4, -1.7, 4), "field number", { anchor: "end", group: "pb" }),
+      pill("n-l", [420, 116], "field number", { anchor: "end", group: "pb" }),
       raise(cells("f-pb", 0, 0, 4, [52, 28], ["1", "4470", "2", "web", "3", "m.l@…", "4", "899", { t: "5", hot: true }, { t: "gift", hot: true }], { title: "One message", sub: "field number, value", group: "pb" }), LEFT, 30),
       schema("k-pb", "order.proto", "Finance's copy", ["int32 order = 1", "string channel = 2", "string email = 3", "int32 amount = 4"], "pb"),
       pill("pb-co", [110, 440], "order.proto", { glyph: "doc", sub: "Checkout: fields 1 to 5", group: "pb" }),
@@ -68,7 +68,7 @@ export default defineGuide({
       ...grid("col", BIN, "col", { byColumn: true }),
       ...FIELDS.map((f, i) => pill(`c-${f.k}`, up(-1, i * P + SIZE / 2, 14), f.k, { anchor: "end", mono: true, group: "col" })),
       prism("ftr", 0, 4 * P + 0.3, W, 1.4, 16, { hue: "track", glyph: "doc", group: "col" }),
-      pill("ftr-l", [120, 196], "Footer", { sub: "schema, chunk locations", to: up(0.3, 4 * P + 1, 16), group: "col" }),
+      pill("ftr-l", [105, 180], "Footer", { sub: "schema, chunk locations", to: up(0.3, 4 * P + 1, 16), group: "col" }),
       schema("k-col", "Schema", "from the file footer", ["order: int32", "channel: string", "email: string", "amount: int32"], "col"),
       pill("zip", [480, 52], "Compressed pages", { glyph: "layers", sub: "Snappy, Gzip, Zstandard", to: up(SIZE / 2, SIZE / 2, BIN), group: "codec" }),
 

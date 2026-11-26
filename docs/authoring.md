@@ -95,10 +95,12 @@ Choose the vocabulary the concept needs. Read the nearest reference guide before
 | --- | --- | --- |
 | Systems and what flows between them | `prism`, `drum`, `slab`, `pawn`, rails (`line`) with `stop`s, cards stood on posts with `raise` | `data/ingestion`, `ai/prompt-injection`, `ml/tabular-foundation-models` |
 | How data is laid out or how much of it is touched | `blocks` on the floor, `cells`, `table` | `data/columnar-storage` |
-| A quantity that changes, a curve, a distribution, a boundary | `plot` with `series`, `band`, `rule` | `ml/loss-and-optimisation` |
+| A quantity that changes, a curve, a distribution, a boundary | `plot` with `series`, `band`, `rule`, `shade` | `ml/loss-and-optimisation` |
 | A hierarchy, a tree, a graph | `treeOf` or `node` with thin lines | `data/indexes-and-storage-engines` |
 | A budget that fills | `tank` | `ai/context-engineering` |
 | A neural network | `layers` | none yet |
+
+Scene helpers also support coloured table rows (`hue`) and columns (`columnHues`); labelled floor blocks with per-item `label`, `hue` and `state: "alert"`; alert states on prisms and drums; and rectangular plot shading with `shade(id, plotId, [xFrom, yFrom, xTo, yTo])`. `layerUnitPositions` returns unit coordinates, and `layerConnection` makes a named route between units that can carry a ride. `layers.connections` can restrict the network drawing to selected unit pairs.
 
 All helpers are exported from `@signal-path/engine`. Their signatures and comments are in `packages/engine/src/dsl.ts`, and every element's fields are in `packages/engine/src/types.ts`.
 
@@ -106,7 +108,7 @@ Rules that keep a scene readable:
 
 - **One story.** Pick the object the reader follows: a record on a rail, a weight on a curve, a query through a tree. Each stop changes one thing about it.
 - **Reveal, do not redraw.** Put each element in a `group`, and let each step `show` the groups it needs. Elements marked `always` stay. To change an object, define its variants in different groups at the same place.
-- **A record rides.** `ride(line, from, to, label)` moves a record along a rail, a thin line or a line series of a plot. `via` stops are pauses and `then` is its text after the first pause. On the floor the record is a puck with its text above. On a plot it is a dot. On flat lines pass `shape: "pill"`.
+- **A record rides.** `ride(line, from, to, label)` moves a record along a rail, a thin line or a line series of a plot. `via` stops are pauses and `then` changes its text when it reaches the final stop. Multiple rides in a step run in source order, one after another. On the floor the record is a puck with its text above. On a plot it is a dot. On flat lines pass `shape: "pill"`.
 - **Use the canvas.** A scene that fills a third of the canvas is too small. Scale the grid positions up until the picture spans most of the width.
 - **Rails run along one grid axis** and turn at right angles on the grid. Put a block's name plate (`at`) on the side no rail leaves from.
 - **Boards need room.** Keep 200 pixels between the centres of two cards on posts. Text in records and plates stays short: 14 characters is a good ceiling.

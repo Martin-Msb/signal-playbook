@@ -1,0 +1,17 @@
+sources:
+  - {id: training-s1, title: "Brown et al.: Language Models are Few-Shot Learners", url: "https://arxiv.org/abs/2005.14165", kind: primary, vendor: false}
+  - {id: training-s2, title: "Ouyang et al.: Training language models to follow instructions with human feedback", url: "https://arxiv.org/abs/2203.02155", kind: primary, vendor: false}
+  - {id: training-s3, title: "Mitchell et al.: Model Cards for Model Reporting", url: "https://arxiv.org/abs/1810.03993", kind: primary, vendor: false}
+  - {id: training-s4, title: "Gu et al.: BadNets: Identifying Vulnerabilities in the Machine Learning Model Supply Chain", url: "https://arxiv.org/abs/1708.06733", kind: primary, vendor: false}
+  - {id: training-s5, title: "European Union: Artificial Intelligence Act, consolidated text", url: "https://eur-lex.europa.eu/eli/reg/2024/1689/2026-07-27/eng", kind: primary, vendor: false}
+  - {id: training-s6, title: "Hugging Face: Share a model", url: "https://huggingface.co/docs/transformers/model_sharing", kind: primary, vendor: true}
+claims:
+  - {id: training-pretraining, class: A, sources: [training-s1], verified: "2026-11-26", text: "The GPT-3 study describes pretraining an autoregressive language model on a large text corpus before using it for tasks through text interaction."}
+  - {id: training-supervised-tuning, class: A, sources: [training-s2], verified: "2026-11-26", text: "The InstructGPT study used labeler-written demonstrations to fine-tune GPT-3 with supervised learning."}
+  - {id: training-human-feedback, class: A, sources: [training-s2], verified: "2026-11-26", text: "The InstructGPT method trains a reward model from rankings of model outputs and then applies reinforcement learning from human feedback."}
+  - {id: training-feedback-limits, class: A, sources: [training-s2], verified: "2026-11-26", text: "The authors state that their method aligns behaviour to the stated preferences of a specific group of labelers and researchers, rather than a broader notion of human values."}
+  - {id: training-no-updates-at-use, class: A, sources: [training-s1], verified: "2026-11-26", text: "In the GPT-3 few-shot study, tasks and demonstrations are specified by text interaction without gradient updates or fine-tuning at use time."}
+  - {id: training-model-cards, class: A, sources: [training-s3], verified: "2026-11-26", text: "Model cards are proposed to document intended use, performance evaluation procedures and other relevant information about a trained model."}
+  - {id: training-poisoning, class: A, sources: [training-s4], verified: "2026-11-26", text: "The BadNets study demonstrates that an adversary can create a maliciously trained network that behaves badly on attacker-chosen inputs."}
+  - {id: training-ai-act, class: C, sources: [training-s5], verified: "2026-11-26", text: "Article 53 of the consolidated EU AI Act requires providers of general-purpose AI models to put in place a policy to comply with Union copyright law and to publish a sufficiently detailed summary of training content."}
+  - {id: training-versioning, class: B, sources: [training-s6], verified: "2026-11-26", text: "Hugging Face model repositories support revisions identified by a commit hash, tag or branch, and a fixed commit or tag can pin a model version."}

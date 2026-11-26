@@ -4,10 +4,10 @@ import type { El, Hue } from "@signal-path/engine";
 // The floor: one rail runs from the sources to three bays in front of it. A block is one field of one record and its colour is the field's name.
 // The table bay is a full grid, the JSON bay has rows of different length, and the file bay holds undivided slabs.
 // Extraction sets fields beside a file. One board at the back shows the data of the current stop.
-const G = isoGrid(140, 95, 30);
-const SIZE = 1, GAP = 0.3, PITCH = SIZE + GAP, H = 18, FRONT = 1.3;
-const AT = { a: 4.2, b: 10.65, c: 16.8, x: 21.6, end: 23.3 };
-const BOARD: [number, number] = [722, 222];
+const G = isoGrid(215, 78, 30);
+const SIZE = 1, GAP = 0.3, PITCH = SIZE + GAP, H = 18, FRONT = 3.5;
+const AT = { a: 4.2, b: 10.65, c: 16.8, x: 19.9, end: 23.3 };
+const BOARD: [number, number] = [770, 196];
 const FIELD: Record<string, Hue> = { order: "sky", channel: "mint", amount: "sand", gift: "violet", reason: "rose", vector: "track" };
 const row = (id: string, gx: number, r: number, fields: string[], group?: string): El =>
   blocks(id, gx, FRONT + r * PITCH, fields.length, SIZE, fields.map((f) => ({ h: H, hue: FIELD[f] })), { gap: GAP, group, always: !group });
@@ -15,8 +15,8 @@ const file = (id: string, r: number, w: number, glyph: string): El =>
   prism(id, 15.3, FRONT + r * 1.65, w, 1.2, H, { hue: "paper", glyph, group: "files" });
 const found = (id: string, r: number, fields: string[]): El =>
   blocks(id, 18.8, FRONT + 0.1 + r * 1.65, fields.length, 0.8, fields.map((f) => ({ h: H, hue: FIELD[f] })), { gap: 0.2, group: "found" });
-const plate = (id: string, gx: number, text: string, sub: string, glyph: string, group?: string): El =>
-  pill(id, G.p(gx, 7.1), text, { sub, glyph, group, always: !group });
+const plate = (id: string, gx: number, gy: number, text: string, sub: string, glyph: string, group?: string): El =>
+  pill(id, G.p(gx, gy), text, { sub, glyph, group, always: !group });
 const board = <T extends Parameters<typeof raise>[0]>(el: T): T => raise(el, BOARD, 30);
 
 export default defineGuide({
@@ -32,34 +32,36 @@ export default defineGuide({
     note: "Orders, messages and scan results are illustrative",
     label: "One rail runs from the sources past three bays. In the table bay every row has the same three fields. In the JSON bay each record has its own set of fields. In the file bay an email, a photo and a call recording are undivided slabs. Extraction then sets an order number, a reason and an embedding beside the email, and a content scan finds personal data in the files. A board shows the data at each stop.",
     els: [
-      prism("src", -1.6, -0.7, 1.4, 1.4, 30, { hue: "sky", glyph: "stack", title: "Sources", sub: "checkout, app, inbox", at: "n", always: true }),
+      prism("src", -1.6, -0.7, 1.4, 1.4, 30, { hue: "sky", glyph: "stack", title: "Sources", sub: "checkout, app, inbox", at: "w", always: true }),
       line("main", [G.p(-0.2, 0), G.p(AT.end, 0)], { always: true }),
       line("end", [G.p(AT.end, -0.55), G.p(AT.end, 0.55)], { tone: "ink", w: 7, always: true }),
       stop("s-a", ...G.p(AT.a, 0), undefined, undefined, { always: true }),
       stop("s-b", ...G.p(AT.b, 0), undefined, undefined, { always: true }),
       stop("s-c", ...G.p(AT.c, 0), undefined, undefined, { always: true }),
       stop("s-x", ...G.p(AT.x, 0), undefined, undefined, { group: "found" }),
-      stop("s-end", ...G.p(AT.end - 0.6, 0), undefined, undefined, { group: "found" }),
+      stop("s-end", ...G.p(AT.end - 0.3, 0), undefined, undefined, { group: "found" }),
 
       // the table: every row has the same fields
+      ...[["a", AT.a, undefined], ["b", AT.b, "json"], ["c", AT.c, "files"]].map(([k, gx, group]) => line(`st-${k}`, [G.p(gx as number, 0), G.p(gx as number, FRONT)], { tone: "ink", w: 3, group: group as string | undefined, always: !group })),
       ...[0, 1, 2, 3].map((r) => row(`t-${r}`, 2.4, r, ["order", "channel", "amount"])),
-      plate("t-l", AT.a, "Table", "every row, same columns", "table"),
-      pawn("sup", 9.2, 12.6, "Support", "Why was 4471 returned?", { group: "ask" }),
-      pill("t-no", G.p(8.3, -2.6), "no column for it", { tone: "alert", to: G.p(AT.a + 0.5, -0.4), group: "ask" }),
+      plate("t-l", 5.5, 9.1, "Table", "every row, same columns", "table"),
+      pawn("sup", 10.3, 15.6, "Support", "Why was 4471 returned?", { group: "ask" }),
+      pawn("sup2", 10.3, 15.6, "Support", "4471: sofa torn", { group: "told" }),
+      pill("t-no", G.p(8.6, -2.4), "no column for it", { tone: "alert", to: G.p(AT.a + 0.5, -0.4), group: "ask" }),
 
       // JSON: each record brings its own fields
       row("j-0", 8.2, 0, ["order", "channel", "amount"], "json"),
       row("j-1", 8.2, 1, ["order", "channel", "amount", "gift"], "json"),
       row("j-2", 8.2, 2, ["order", "amount"], "more"),
       row("j-3", 8.2, 3, ["order", "channel", "gift"], "more"),
-      plate("j-l", AT.b, "JSON", "each record, own fields", "code", "json"),
+      plate("j-l", 11.9, 9.1, "JSON", "each record, own fields", "code", "json"),
 
       // files: no fields at all, until extraction sets some beside them
       file("f-0", 0, 3, "mail"), file("f-1", 1, 2.2, "eye"), file("f-2", 2, 3, "play"),
-      plate("f-l", 17.6, "Files", "email, photo, call", "file", "files"),
+      plate("f-l", 16.3, 10.2, "Files", "email, photo, call", "file", "files"),
       prism("ex", AT.x - 0.7, -0.7, 1.4, 1.4, 30, { hue: "track", glyph: "funnel", title: "Extract", sub: "text, then fields", at: "n", group: "found" }),
       found("x-0", 0, ["order", "reason", "vector"]), found("x-2", 2, ["order", "vector"]),
-      pill("scan", [840, 508], "Content scan", { glyph: "search", sub: "reads every file", to: G.p(18.4, 2.4, H), group: "gov" }),
+      pill("scan", [862, 462], "Content scan", { glyph: "search", sub: "reads every file", to: G.p(18.1, FRONT + 0.6, H), group: "gov" }),
 
       // the board: the data of the current stop
       board(table("b-table", 0, 0, 236, ["order", "channel", "amount"], [["4469", "web", "129"], ["4470", "store", "349"], { cells: ["4471", "app", "899"], hot: true }],
@@ -121,7 +123,7 @@ export default defineGuide({
     step({
       id: "extract", label: "Extraction", kind: "mechanism", title: "Extraction gives a file its shape",
       caption: "Text extraction pulls the words out of the email. Order 4471 and its reason become a row Support can query, and an embedding places the text near similar complaints.",
-      show: ["json", "more", "files", "found", "b-rows", "ask"], counters: ["at extraction", "the extracted rows", "another extraction", "files and rows"],
+      show: ["json", "more", "files", "found", "b-rows", "told"], counters: ["at extraction", "the extracted rows", "another extraction", "files and rows"],
       rides: [ride("main", "s-c", "s-end", "email.eml", { via: ["s-x"], then: "4471 torn" })],
       body: ["Apache Tika detects and extracts metadata and text from over a thousand file types, including single email messages, and can run OCR on images through Tesseract. A speech recognition model such as Whisper turns a recording into text.",
         "An embedding is a vector of floating point numbers, and the distance between two vectors measures their relatedness. pgvector stores such vectors in Postgres with the rest of the data and searches them by nearest neighbour.",
@@ -133,7 +135,6 @@ export default defineGuide({
       id: "decide", label: "Decide", kind: "decision", title: "How much shape to fix in advance",
       caption: "",
       show: ["json", "more", "files", "found", "gov", "b-scan"], counters: ["at extraction", "the extracted rows", "another extraction", "files and rows"],
-      rides: [ride("main", 0, "s-c", "scan", { via: ["s-b"] })],
       body: [{ pair: {
         left: { label: "Fix it", items: ["Fields are known and stable", "Types are checked on load"] },
         right: { label: "Leave it open", items: ["Fields differ per record", "Content is text or media", "Files are scanned for personal data"] },

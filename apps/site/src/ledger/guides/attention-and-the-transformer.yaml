@@ -1,0 +1,11 @@
+sources:
+  - {id: attention-and-the-transformer-s1, title: "Vaswani et al.: Attention Is All You Need", url: "https://arxiv.org/abs/1706.03762", kind: primary, vendor: false}
+  - {id: attention-and-the-transformer-s2, title: "Brown et al.: Language Models are Few-Shot Learners", url: "https://arxiv.org/abs/2005.14165", kind: primary, vendor: false}
+  - {id: attention-and-the-transformer-s3, title: "NIST: Artificial Intelligence Risk Management Framework 1.0", url: "https://nvlpubs.nist.gov/nistpubs/ai/NIST.AI.100-1.pdf", kind: primary, vendor: false}
+claims:
+  - {id: attention-and-the-transformer-self-attention, class: A, sources: [attention-and-the-transformer-s1], verified: "2026-11-26", text: "Self-attention relates different positions of a single sequence to compute a representation of that sequence."}
+  - {id: attention-and-the-transformer-causal-mask, class: A, sources: [attention-and-the-transformer-s2], verified: "2026-11-26", text: "GPT-3 is an autoregressive language model that conditions each output on the preceding text and generates the sequence one token at a time."}
+  - {id: attention-and-the-transformer-attention-weights, class: A, sources: [attention-and-the-transformer-s1], verified: "2026-11-26", text: "Scaled dot-product attention computes query-key dot products, divides by the square root of key dimension, applies softmax to obtain weights, and applies those weights to value vectors."}
+  - {id: attention-and-the-transformer-transformer-layers, class: A, sources: [attention-and-the-transformer-s1], verified: "2026-11-26", text: "The Transformer stacks self-attention and point-wise fully connected sublayers, with residual connections and layer normalisation around sublayers."}
+  - {id: attention-and-the-transformer-context-limit, class: A, sources: [attention-and-the-transformer-s2], verified: "2026-11-26", text: "GPT-3 few-shot demonstrations are provided in context and limited by the model context window."}
+  - {id: attention-and-the-transformer-evaluation, class: A, sources: [attention-and-the-transformer-s3], verified: "2026-11-26", text: "NIST recommends rigorous AI testing and performance assessment with uncertainty measures, benchmarks and documented results, and says AI systems should be tested before deployment and regularly in operation."}

@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { barWidth, box, checkLedger, line, renderScene, rideGeometry, routePath, sceneWarnings, stop, table, visibleWords } from "../src/index.ts";
+import { barWidth, blocks, box, checkLedger, drum, layerConnection, layerUnitPositions, layers, line, plot, renderScene, rideArrivalLabel, rideGeometry, rideQueue, routePath, sceneWarnings, series, shade, stop, table, visibleWords } from "../src/index.ts";
 import type { Claim, Guide, Source, Step } from "../src/index.ts";
 
 const sources: Source[] = [
@@ -122,6 +122,51 @@ test("tables draw rows with a hover tip and a highlighted row", () => {
   const svg = renderScene(g, 0);
   assert.match(svg, /data-tip="order 4471 · channel web"/);
   assert.match(svg, /fill="var\(--tc\)"/);
+});
+
+test("tables can colour an individual row and column", () => {
+  const g = guide();
+  g.scene.els.push(table("colours", 100, 100, 240, ["name", "state"], [{ cells: ["first", "failed"], hue: "rose" }, ["second", "ok"]], { columnHues: [undefined, "mint"], always: true }));
+  const svg = renderScene(g, 0);
+  assert.match(svg, /fill="var\(--m-rose-t\)"/);
+  assert.match(svg, /fill="var\(--m-mint-t\)"/);
+});
+
+test("floor blocks carry labels and alert styling", () => {
+  const g = guide();
+  g.scene.els.push(blocks("tiles", 1, 1, 2, 1, [{ h: 18, label: "kept" }, { h: 18, label: "failed", state: "alert" }], { always: true }));
+  g.scene.els.push(drum("alarm", 5, 2, 0.8, 24, { state: "alert", always: true }));
+  const svg = renderScene(g, 0);
+  assert.match(svg, />kept</);
+  assert.match(svg, />failed</);
+  assert.match(svg, /fill="var\(--aw\)"/);
+  assert.match(svg, /stroke="var\(--alert\)"/);
+});
+
+test("a plot can shade a rectangular data region", () => {
+  const g = guide();
+  const p = plot("window", 100, 100, 240, 140, [0, 10], [0, 10]);
+  g.scene.els.push(p, shade("region", "window", [2, 3, 6, 8]));
+  assert.match(renderScene(g, 0), /<rect x="178\.8" y="134\.8" width="73\.6" height="47" fill="var\(--tc\)" opacity="\.18"\/>/);
+});
+
+test("network unit positions can define a rideable connection", () => {
+  const g = guide();
+  const network = layers("network", 100, 100, 240, 180, [2, 1]);
+  const positions = layerUnitPositions(network);
+  assert.equal(positions[0].length, 2);
+  const route = layerConnection("neuron-route", network, [0, 0], [1, 0]);
+  assert.deepEqual(route.pts, [positions[0][0], positions[1][0]]);
+  g.scene.els.push(network, route);
+  const stepWithRide = { ...g.steps[1], rides: [{ line: route.id, from: 0, to: 1, label: "signal", then: "arrived" }] };
+  g.steps[1] = stepWithRide;
+  assert.ok(rideGeometry(g, stepWithRide.rides[0]));
+});
+
+test("queued rides take turns and change text only on arrival", () => {
+  assert.deepEqual(rideQueue([1200, 800]), [{ offset: 0, total: 1200 }, { offset: 1200, total: 2000 }]);
+  assert.equal(rideArrivalLabel("before", "after", false), "before");
+  assert.equal(rideArrivalLabel("before", "after", true), "after");
 });
 
 test("layout warnings catch text that overflows its plate", () => {

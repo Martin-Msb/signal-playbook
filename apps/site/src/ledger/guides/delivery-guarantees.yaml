@@ -1,0 +1,12 @@
+sources:
+  - {id: delivery-guarantees-s1, title: "Apache Flink: Fault Tolerance", url: "https://nightlies.apache.org/flink/flink-docs-stable/docs/learn-flink/fault_tolerance/", kind: primary, vendor: false}
+  - {id: delivery-guarantees-s2, title: "Apache Flink: Checkpointing", url: "https://nightlies.apache.org/flink/flink-docs-stable/docs/dev/datastream/fault-tolerance/checkpointing/", kind: primary, vendor: false}
+  - {id: delivery-guarantees-s3, title: "Google Cloud Dataflow: Exactly-once in Dataflow", url: "https://docs.cloud.google.com/dataflow/docs/concepts/exactly-once", kind: primary, vendor: true}
+claims:
+  - {id: delivery-guarantees-modes, class: A, sources: [delivery-guarantees-s1], verified: "2026-11-25", text: "Flink describes at-most-once as making no effort to recover from failures, at-least-once as losing nothing but possibly duplicating results, and exactly-once as losing and duplicating nothing."}
+  - {id: delivery-guarantees-processing, class: A, sources: [delivery-guarantees-s1], verified: "2026-11-25", text: "In Flink, exactly-once means every event affects managed state exactly once; it does not mean every event is processed exactly once."}
+  - {id: delivery-guarantees-end-to-end, class: A, sources: [delivery-guarantees-s1], verified: "2026-11-25", text: "Flink says exactly-once end-to-end requires replayable sources and transactional or idempotent sinks."}
+  - {id: delivery-guarantees-checkpoint, class: A, sources: [delivery-guarantees-s2], verified: "2026-11-25", text: "Flink checkpoints state and stream positions so an application can recover the same semantics as failure-free execution."}
+  - {id: delivery-guarantees-retry, class: A, sources: [delivery-guarantees-s3], verified: "2026-11-25", text: "Dataflow retries an RPC until it receives a positive acknowledgement, so a message can be delivered at least once and retries can create duplicates; it tags messages with unique IDs and drops IDs already committed."}
+  - {id: delivery-guarantees-idempotent, class: A, sources: [delivery-guarantees-s3], verified: "2026-11-25", text: "Google recommends making a custom sink idempotent so it can be retried without unintended side effects."}
+  - {id: delivery-guarantees-side-effects, class: A, sources: [delivery-guarantees-s3], verified: "2026-11-25", text: "Dataflow does not guarantee exactly-once side effects to an external store unless the sink also implements exactly-once semantics."}

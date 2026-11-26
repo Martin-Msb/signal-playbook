@@ -5,8 +5,8 @@ import type { El } from "@signal-path/engine";
 // Support's refund assistant joins the rail from behind. The catalogue entry of the dataset stands behind it and
 // is the object that changes: it gains an owner, then labels. The policy check stands on the rail, and the
 // unlabelled copy sits in front, reached by a rail that goes round the check.
-const G = isoGrid(120, 105, 30);
-const AT = { join: 3, wait: 6.6, hold: 7.6, gate: 11, own: 14, data: 17.6, end: 18, ds: 19.4 };
+const G = isoGrid(120, 125, 30);
+const AT = { join: 3, wait: 6.6, hold: 7.6, gate: 11, own: 11.4, data: 15.4, end: 18, ds: 19.4 };
 const ROW = 6.5;
 const thin = (id: string, pts: [number, number][], group: string): El => line(id, pts.map(([x, y]) => G.p(x, y)), { tone: "ink", w: 3, group });
 const entry = (id: string, owner: string, steward: string | undefined, classes: [string, string, string], alert = false): El =>
@@ -41,9 +41,9 @@ export default defineGuide({
       entry("c0", "owner: nobody", undefined, ["?", "?", "?"], true),
       entry("c1", "owner: Operations", "steward: data team", ["?", "?", "?"]),
       entry("c2", "owner: Operations", "steward: data team", ["internal", "internal", "personal"]),
-      pawn("owner", 13.6, 3, "Data owner", undefined, { hue: "track", group: "roles" }),
-      pawn("steward", 16.6, 3, "Data steward", undefined, { hue: "mint", group: "roles" }),
-      pill("cls", [612, 232], "a class per column", { glyph: "flag", to: [724, 262], group: "cls" }),
+      pawn("owner", 13.8, 3.4, "Data owner", undefined, { hue: "track", group: "roles" }),
+      pawn("steward", 17, 3.4, "Data steward", undefined, { hue: "mint", group: "roles" }),
+      pill("cls", [612, 252], "a class per column", { glyph: "flag", to: [724, 282], group: "cls" }),
 
       // the rule as code, checked on the rail
       prism("gate", AT.gate - 0.6, -0.6, 1.2, 1.2, 30, { hue: "track", glyph: "shield", group: "gate" }),
@@ -59,7 +59,7 @@ export default defineGuide({
       drum("copy", 13, ROW, 1.1, 34, { hue: "sky", glyph: "table", title: "orders_copy", sub: "no owner, no labels", at: "s", group: "copy" }),
       line("by", [G.p(6, 0), G.p(6, ROW), G.p(11.9, ROW)], { tone: "alert", group: "copy" }),
       stop("p-by", ...G.p(6, 0), undefined, undefined, { group: "copy" }),
-      stop("p-copy", ...G.p(10.2, ROW), undefined, undefined, { group: "copy" }),
+      stop("p-copy", ...G.p(9, ROW), undefined, undefined, { group: "copy" }),
       drum("copy2", 13, ROW, 1.1, 34, { hue: "sky", glyph: "table", title: "orders_copy", sub: "labels inherited", at: "s", group: "fix" }),
       line("byx", [G.p(6, 0), G.p(6, ROW), G.p(11.9, ROW)], { state: "closed", group: "fix" }),
     ],

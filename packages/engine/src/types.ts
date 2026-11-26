@@ -50,12 +50,14 @@ export interface BoxEl extends ElBase {
   /** Set the title in the data face, for identifiers such as model names. */
   mono?: boolean;
 }
-export type Row = string[] | { cells: string[]; hot?: boolean; strike?: boolean; mute?: boolean };
-/** A table drawn as a table: header, rows, highlighted and struck rows. */
+export type Row = string[] | { cells: string[]; hot?: boolean; strike?: boolean; mute?: boolean; hue?: Hue };
+/** A table drawn as a table: header, rows, highlighted rows, and per-column or row hues. */
 export interface TableEl extends ElBase {
   kind: "table"; x: number; y: number; w: number; cols: string[];
   /** Column offsets from the left edge. Even spacing when absent. */
   at?: number[];
+  /** Optional fill hue for each column, in column order. */
+  columnHues?: (Hue | undefined)[];
   rows: Row[]; rowH?: number; title?: string; sub?: string; mono?: boolean; foot?: string; tone?: Tone;
   /** Set the title under the card, for cards that hang below a line. */
   below?: boolean;
@@ -120,12 +122,12 @@ export interface PrismEl extends ElBase {
   /** Where the name plate sits: under the front corner, above the block, beside it, or below and to the left. */
   at?: "s" | "n" | "e" | "w" | "sw" | "se";
   /** closed draws a struck outline, for something removed. */
-  state?: "open" | "closed";
+  state?: "open" | "closed" | "alert";
   /** Height of the floor the block stands on, in pixels. */
   z?: number;
 }
 /** A store: a drum centred on a grid point. */
-export interface DrumEl extends ElBase { kind: "drum"; gx: number; gy: number; r: number; h: number; hue?: Hue; glyph?: string; title?: string; sub?: string; at?: "s" | "n" | "e" | "w" | "sw" | "se"; z?: number }
+export interface DrumEl extends ElBase { kind: "drum"; gx: number; gy: number; r: number; h: number; hue?: Hue; glyph?: string; title?: string; sub?: string; state?: "open" | "alert"; at?: "s" | "n" | "e" | "w" | "sw" | "se"; z?: number }
 /** A raised floor plate: a system boundary that other objects stand on. */
 export interface SlabEl extends ElBase { kind: "slab"; gx: number; gy: number; w: number; d: number; h: number; label?: string; hue?: Hue; glyph?: string }
 /** A glass container that fills with layers, for budgets such as a context window. */
@@ -165,10 +167,12 @@ export interface PlotEl extends ElBase {
  * A record can ride a line series: name the series as the ride's line.
  */
 export interface SeriesEl extends ElBase {
-  kind: "series"; plot: string; as: "line" | "points" | "area" | "bars" | "band" | "rule";
+  kind: "series"; plot: string; as: "line" | "points" | "area" | "bars" | "band" | "rule" | "rect";
   pts?: [number, number][];
   /** band: [from, to]. rule: the value. Both on `axis`, x by default. */
   at?: number | [number, number]; axis?: "x" | "y";
+  /** rect: [xFrom, yFrom, xTo, yTo] in plot data units. */
+  region?: [number, number, number, number];
   tone?: Tone;
   /** Fill of points and bars. hues gives one per point, for classes. */
   hue?: Hue; hues?: Hue[];
@@ -197,7 +201,7 @@ export interface BlocksEl extends ElBase {
   /** Side of one block and the space between blocks, in grid units. */
   size: number; gap?: number;
   /** One block each, in order. h is its height in pixels. */
-  items: { h: number; hue?: Hue; hot?: boolean; state?: "open" | "closed" }[];
+  items: { h: number; hue?: Hue; hot?: boolean; state?: "open" | "closed" | "alert"; label?: string }[];
   /** The direction a row runs in. gx by default. */
   dir?: "gx" | "gy";
   title?: string; sub?: string; glyph?: string; at?: "s" | "n" | "e" | "w" | "sw" | "se"; z?: number;
@@ -217,6 +221,8 @@ export interface LayersEl extends ElBase {
   /** Units per layer, input first. */
   sizes: number[];
   labels?: string[];
+  /** Explicit [fromLayer, fromUnit, toLayer, toUnit] connections. Defaults to fully connected adjacent layers. */
+  connections?: [number, number, number, number][];
   /** Units drawn lit, as [layer, unit]. Connections between lit units are lit too. */
   hot?: [number, number][];
   title?: string; sub?: string; below?: boolean; stand?: Pt;
@@ -234,7 +240,7 @@ export interface Ride {
   via?: (string | number)[];
   /** Text on the record, in the data face. */
   label: string;
-  /** The record's text after it passes the first via stop: the record changes shape on the route. */
+  /** The record's text after it reaches its final stop. */
   then?: string;
   shape?: "pill" | "row" | "doc" | "dot" | "puck";
   tone?: Tone;

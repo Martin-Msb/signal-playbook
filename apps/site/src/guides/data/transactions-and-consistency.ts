@@ -79,9 +79,9 @@ export default defineGuide({
       pill("ser", NOTE, "Serializable", { glyph: "shield", sub: "rolls one back, it retries", group: "skew" }),
 
       // 6. the commit is logged before it is reported
-      line("tolog", [G.p(AT.commit, 0), G.p(AT.commit, 3.2)], { group: "gov" }),
-      drum("wal", AT.commit, 4.4, 1, 34, { hue: "sand", glyph: "lines", title: "Write-ahead log", sub: "logged, then reported complete", at: "w", group: "gov" }),
-      pill("pitr", [610, 490], "Replay", { glyph: "replay", sub: "restore any logged instant", to: G.p(AT.commit + 0.9, 4.7), group: "gov" }),
+      line("tolog", [G.p(AT.commit, 0), G.p(AT.commit, 4.1)], { group: "gov" }),
+      drum("wal", AT.commit, 5.3, 1, 34, { hue: "sand", glyph: "lines", title: "Write-ahead log", sub: "logged, then reported complete", at: "w", group: "gov" }),
+      pill("pitr", [620, 462], "Replay", { glyph: "replay", sub: "restore any logged instant", to: G.p(AT.commit + 0.9, 5.6), group: "gov" }),
     ],
   },
   steps: [
@@ -140,7 +140,7 @@ export default defineGuide({
       id: "decide", label: "Decide", kind: "decision", title: "What a transaction settles and what the level settles",
       caption: "",
       show: ["o-ret", "r-done", "f-all", "gov"], counters: ["one transaction, logged", "all of it", "Serializable, with retry"],
-      rides: [ride("tolog", 0, 0.45, "commit 4471"), ride("read", "r-s", "r-f", "899 and 899")],
+      rides: [ride("tolog", 0, 0.52, "commit 4471"), ride("read", "r-s", "r-f", "899 and 899")],
       body: [{ pair: {
         left: { label: "The transaction", items: ["All changes or none", "Nothing visible before commit", "A logged, durable commit"] },
         right: { label: "The level", items: ["Snapshot per statement or transaction", "Which anomalies remain", "Whether to retry"] },

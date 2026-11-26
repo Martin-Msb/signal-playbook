@@ -1,0 +1,12 @@
+sources:
+  - {id: data-products-and-sharing-s1, title: "Linux Foundation: Open Data Product Specification 4.2", url: "https://opendataproducts.org/v4.2/", kind: primary, vendor: false}
+  - {id: data-products-and-sharing-s2, title: "Apache Iceberg: REST Catalog Spec", url: "https://iceberg.apache.org/rest-catalog-spec/", kind: primary, vendor: false}
+  - {id: data-products-and-sharing-s3, title: "Databricks: Create shares for OpenSharing", url: "https://docs.databricks.com/aws/en/opensharing/create-share", kind: primary, vendor: true}
+  - {id: data-products-and-sharing-s4, title: "Databricks: Manage data recipients for OpenSharing", url: "https://docs.databricks.com/gcp/en/opensharing/manage-recipients", kind: primary, vendor: true}
+claims:
+  - {id: data-products-and-sharing-product, class: A, sources: [data-products-and-sharing-s1], verified: "2026-11-26", text: "The Open Data Product Specification is a machine-readable model for describing the structure and attributes of digital data products."}
+  - {id: data-products-and-sharing-contract, class: A, sources: [data-products-and-sharing-s1], verified: "2026-11-26", text: "The Open Data Product Specification supports data contracts, service level agreements and quality profiles in a product definition."}
+  - {id: data-products-and-sharing-interface, class: A, sources: [data-products-and-sharing-s2], verified: "2026-11-26", text: "The Iceberg REST catalog protocol defines a common API for catalog operations that clients can use with any catalog implementing the protocol."}
+  - {id: data-products-and-sharing-sharing, class: B, sources: [data-products-and-sharing-s3, data-products-and-sharing-s4], verified: "2026-11-26", text: "Databricks shares are collections of data assets made available to recipients, and providers grant recipient access to shares."}
+  - {id: data-products-and-sharing-copy, class: B, sources: [data-products-and-sharing-s3], verified: "2026-11-26", text: "A share makes provider assets available to recipients through sharing rather than requiring the provider to create a separate export copy."}
+  - {id: data-products-and-sharing-review, class: A, sources: [data-products-and-sharing-s4], verified: "2026-11-26", text: "Providers can view recipient share permissions and delete a recipient to end that recipient's access to shared data."}
