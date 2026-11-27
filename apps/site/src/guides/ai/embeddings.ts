@@ -70,7 +70,7 @@ export default defineGuide({
       caption: "Training on language usage can place related words near each other. Refund, return and exchange sit close in this illustrative map; the coordinates are not universal definitions.",
       show: ["space", "near"], counters: ["return", "learned vector", "not added", "nearby vectors"],
       rides: [ride("flow", "flow-start", "flow-end", "related usage")],
-      body: ["Word vector research found that learned representations can capture syntactic and semantic regularities. What counts as similar depends on the training data and model."],
+      body: ["Word vector research found that learned representations can capture syntactic and semantic regularities. Mikolov and colleagues report that accuracy depends on vector dimensionality and the amount of training data."],
       claims: ["embeddings-geometry"],
     }),
     step({
@@ -82,8 +82,8 @@ export default defineGuide({
       claims: ["embeddings-position"],
     }),
     step({
-      id: "search", label: "Similarity", kind: "watch-out", title: "Cosine similarity compares direction",
-      caption: "A search model encodes a query and documents, then ranks them by cosine similarity. A vector index can retrieve nearby candidates, but closeness is not proof of relevance.",
+      id: "search", label: "Similarity", kind: "watch-out", title: "Cosine similarity ranks the candidates",
+      caption: "A search model encodes a query and documents, then ranks them by cosine similarity. An approximate index retrieves nearby candidates faster, but can miss some high-similarity vectors.",
       show: ["space", "query"], counters: ["refund query", "query vector", "position-aware", "ranked candidates"],
       rides: [ride("flow", "flow-start", "flow-end", "refund query")],
       body: ["Sentence Transformers uses cosine similarity by default for semantic search and recommends matching query and document encoding for asymmetric search. Approximate nearest-neighbour indexes trade exactness for search speed."],
@@ -101,7 +101,7 @@ export default defineGuide({
       claims: ["embeddings-cosine", "embeddings-personal-data"],
     }),
   ],
-  governance: { text: "Treat embeddings as governed data when they can still be linked to an identifiable person. Access, retention and erasure controls must account for derived vectors as well as source text.", claims: ["embeddings-personal-data"] },
+  governance: { text: "The GDPR defines personal data as any information relating to an identifiable person and grants erasure on specified grounds. Assess whether vectors derived from customer text meet that definition, and apply access, retention and erasure controls to them as to the source text.", claims: ["embeddings-personal-data"] },
   closing: {
     pitfalls: [
       "Reading a two-dimensional sketch as the model's actual space.",

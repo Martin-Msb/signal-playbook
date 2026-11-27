@@ -16,7 +16,7 @@ sources:
     vendor: true
   - id: serving-data-to-ml-and-ai-s4
     title: "Qdrant: Points"
-    url: "https://qdrant.tech/documentation/concepts/points/"
+    url: "https://qdrant.tech/documentation/manage-data/points/"
     kind: primary
     vendor: true
   - id: serving-data-to-ml-and-ai-s5
@@ -29,44 +29,124 @@ sources:
     url: "https://eur-lex.europa.eu/eli/reg/2016/679/oj/eng/"
     kind: primary
     vendor: false
+  - id: serving-data-to-ml-and-ai-s7
+    title: "Feast: Online store"
+    url: "https://docs.feast.dev/getting-started/components/online-store"
+    kind: primary
+    vendor: true
+  - id: serving-data-to-ml-and-ai-s8
+    title: "Google: Rules of Machine Learning"
+    url: "https://developers.google.com/machine-learning/guides/rules-of-ml"
+    kind: primary
+    vendor: false
+  - id: serving-data-to-ml-and-ai-s9
+    title: "Databricks: Databricks AI Search"
+    url: "https://docs.databricks.com/aws/en/vector-search/vector-search"
+    kind: primary
+    vendor: true
+  - id: serving-data-to-ml-and-ai-s10
+    title: "Databricks: Create vector search endpoints and indexes"
+    url: "https://docs.databricks.com/aws/en/vector-search/create-vector-search"
+    kind: primary
+    vendor: true
+  - id: serving-data-to-ml-and-ai-s11
+    title: "Microsoft Learn: Integrated vectorization in Azure AI Search"
+    url: "https://learn.microsoft.com/en-us/azure/search/vector-search-integrated-vectorization"
+    kind: primary
+    vendor: true
+  - id: serving-data-to-ml-and-ai-s12
+    title: "pgvector: README"
+    url: "https://github.com/pgvector/pgvector/blob/master/README.md"
+    kind: primary
+    vendor: true
 claims:
+  - id: serving-data-to-ml-and-ai-skew
+    class: A
+    sources: [serving-data-to-ml-and-ai-s8]
+    verified: "2026-11-27"
+    text: "Training-serving skew is a difference between performance during training and performance during serving, and one of its causes is a change in the data between training and serving."
   - id: serving-data-to-ml-and-ai-historical-and-online-retrieval
     class: A
     sources: [serving-data-to-ml-and-ai-s2]
-    verified: "2026-11-26"
+    verified: "2026-11-27"
     text: "Feast supports historical feature retrieval for training datasets and online feature retrieval for real-time inference."
   - id: serving-data-to-ml-and-ai-point-in-time-join
     class: A
     sources: [serving-data-to-ml-and-ai-s1]
-    verified: "2026-11-26"
+    verified: "2026-11-27"
     text: "A point-in-time join reproduces feature state at a past time, and created-timestamp filtering can exclude values unavailable at the entity timestamp."
+  - id: serving-data-to-ml-and-ai-scan-back
+    class: A
+    sources: [serving-data-to-ml-and-ai-s1]
+    verified: "2026-11-27"
+    text: "Feast scans backward in time from each timestamp in the entity dataframe, up to the TTL specified, and by default constrains only the feature's event timestamp."
+  - id: serving-data-to-ml-and-ai-no-future-data
+    class: A
+    sources: [serving-data-to-ml-and-ai-s3]
+    verified: "2026-11-27"
+    text: "Feast generates point-in-time correct feature sets to ensure that no future data leaks into model training."
   - id: serving-data-to-ml-and-ai-offline-online-stores
     class: A
     sources: [serving-data-to-ml-and-ai-s3]
-    verified: "2026-11-26"
+    verified: "2026-11-27"
     text: "Feast describes offline stores for historical feature extraction and online stores for low-latency production feature serving."
+  - id: serving-data-to-ml-and-ai-online-latest
+    class: A
+    sources: [serving-data-to-ml-and-ai-s7]
+    verified: "2026-11-27"
+    text: "The Feast online store keeps only the latest feature values for each entity key, with no history, and values are loaded into it through materialisation."
   - id: serving-data-to-ml-and-ai-online-serving-push
     class: A
     sources: [serving-data-to-ml-and-ai-s3]
-    verified: "2026-11-26"
-    text: "Feast pushes feature values to the online store to reduce retrieval latency."
+    verified: "2026-11-27"
+    text: "Feast uses a push model for online serving: the feature store pushes feature values to the online store."
   - id: serving-data-to-ml-and-ai-pipeline-keeps-features-current
     class: A
     sources: [serving-data-to-ml-and-ai-s3]
-    verified: "2026-11-26"
-    text: "Feast relies on upstream data pipelines to make feature values consistently available."
+    verified: "2026-11-27"
+    text: "Feast does not orchestrate workflows and relies on upstream data pipelines to produce feature values."
+  - id: serving-data-to-ml-and-ai-chunk-and-embed
+    class: B
+    sources: [serving-data-to-ml-and-ai-s11]
+    verified: "2026-11-27"
+    text: "Unless raw documents are small, chunking is necessary to meet the token input requirements of embedding models, and Azure AI Search can run chunking and embedding as skills of an indexer pipeline that fills a search index."
+  - id: serving-data-to-ml-and-ai-vectors-with-data
+    class: B
+    sources: [serving-data-to-ml-and-ai-s12]
+    verified: "2026-11-27"
+    text: "pgvector provides vector similarity search for Postgres and stores vectors with the rest of the data."
+  - id: serving-data-to-ml-and-ai-index-from-table
+    class: C
+    sources: [serving-data-to-ml-and-ai-s9]
+    verified: "2026-11-27"
+    text: "Databricks AI Search, formerly Databricks Vector Search, creates an index from a source table such as a Delta table, and Databricks can calculate the embeddings with a model the user specifies."
+  - id: serving-data-to-ml-and-ai-index-governed
+    class: B
+    sources: [serving-data-to-ml-and-ai-s9]
+    verified: "2026-11-27"
+    text: "Databricks AI Search indexes appear in and are governed by Unity Catalog."
+  - id: serving-data-to-ml-and-ai-sync-modes
+    class: B
+    sources: [serving-data-to-ml-and-ai-s10, serving-data-to-ml-and-ai-s9]
+    verified: "2026-11-27"
+    text: "A Delta Sync index syncs automatically with its source table and updates incrementally. Continuous mode keeps it in sync with seconds of latency, triggered mode syncs when started through the SDK or REST API, and a Direct Vector Access index is updated by its owner."
+  - id: serving-data-to-ml-and-ai-source-changes-flow
+    class: B
+    sources: [serving-data-to-ml-and-ai-s11]
+    verified: "2026-11-27"
+    text: "When data changes in the source, an Azure AI Search indexer can move the updates through chunking, vectorisation and indexing, and running it on a schedule picks up changed documents."
   - id: serving-data-to-ml-and-ai-vector-record-updates
     class: A
     sources: [serving-data-to-ml-and-ai-s4]
-    verified: "2026-11-26"
+    verified: "2026-11-27"
     text: "Qdrant points contain a vector and optional payload, and its point operations support inserting, updating and deleting records."
   - id: serving-data-to-ml-and-ai-vector-filtering
     class: A
     sources: [serving-data-to-ml-and-ai-s5]
-    verified: "2026-11-26"
+    verified: "2026-11-27"
     text: "Qdrant can apply payload and point identifier conditions when searching or retrieving points."
   - id: serving-data-to-ml-and-ai-erasure-recipients
     class: A
     sources: [serving-data-to-ml-and-ai-s6]
-    verified: "2026-11-26"
+    verified: "2026-11-27"
     text: "Under specified conditions, the GDPR requires controllers to communicate erasure to recipients and take reasonable steps concerning copies or replications of personal data."

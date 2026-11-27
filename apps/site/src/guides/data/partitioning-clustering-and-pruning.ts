@@ -70,18 +70,18 @@ export default defineGuide({
     }),
     step({
       id: "cluster", label: "Cluster", kind: "mechanism", title: "Sort within the selected month",
-      caption: "March still holds many orders. Clustering groups nearby customer values into blocks, creating smaller ranges inside the partition.",
+      caption: "March still holds many orders. Clustering sorts them into storage blocks by customer, so a filter on customer scans only the relevant blocks.",
       show: ["cluster", "partition-labels", "query", "rail", "cluster-label"], counters: ["month + customer", "4 of 24", "date, customer", "fewer bytes"],
       rides: [ride("scan", "s-engine", "s-march", "customer 22")],
-      body: ["BigQuery sorts blocks by the chosen cluster columns. With multiple columns, their declared order controls which filters get the strongest locality."],
+      body: ["BigQuery sorts blocks by the chosen cluster columns. With multiple columns, their order determines which columns take precedence when data is sorted into blocks."],
       claims: ["partitioning-clustering-and-pruning-cluster"],
     }),
     step({
-      id: "metadata", label: "Statistics", kind: "mechanism", title: "Metadata rules out files and pages",
-      caption: "File and column statistics describe value ranges. If customer 22 lies outside a range, the reader skips that file or page without opening its values.",
+      id: "metadata", label: "Statistics", kind: "mechanism", title: "Metadata rules out pages and blocks",
+      caption: "A Parquet page index holds lower and upper bounds for each page. If customer 22 lies outside the bounds, the reader skips the page. BigQuery prunes blocks using block metadata.",
       show: ["stats", "partition-labels", "query", "rail", "stats-label"], counters: ["month + customer", "2 of 24", "min/max statistics", "lower scan"],
       rides: [ride("scan", "s-engine", "s-march", "matching range")],
-      body: ["Parquet page indexes store page statistics that can be used to skip pages. BigQuery uses block metadata and filter expressions to prune blocks that cannot match."],
+      body: ["Parquet page indexes store lower and upper bounds for the values of each page, which readers can use to skip pages when scanning. BigQuery uses the filter expression and block metadata to prune the blocks a query scans."],
       claims: ["partitioning-clustering-and-pruning-statistics", "partitioning-clustering-and-pruning-cluster"],
     }),
     step({
@@ -89,7 +89,7 @@ export default defineGuide({
       caption: "The query scans less, but a tenant filter is not automatically a permission. A row policy decides which rows a user can see.",
       show: ["access", "partition-labels", "query", "rail", "access-label"], counters: ["month + customer", "2 of 24", "policy + filter", "lower scan"],
       rides: [ride("scan", "s-engine", "s-march", "permitted rows")],
-      body: ["BigQuery row-level access policies filter rows for specified users and groups. These policies are separate from partition pruning and do not participate in it."],
+      body: ["BigQuery row-level security gives access to specific rows based on qualifying user conditions. Row-level access policy filters do not participate in query pruning on partitioned and clustered tables."],
       claims: ["partitioning-clustering-and-pruning-access"],
     }),
     step({
@@ -100,11 +100,11 @@ export default defineGuide({
       body: [{ pair: {
         left: { label: "Partition", items: ["Coarse, stable filter such as event month", "A useful boundary for scan scope"] },
         right: { label: "Cluster and prune", items: ["Sort for frequent selective filters", "Use metadata to skip ranges that cannot match"] },
-      } }, "Scan size is spend. Tenant or region partitions can support operational isolation and residency planning, while access policies remain explicit."],
+      } }, "Scan size is spend: BigQuery leaves pruned partitions out of the bytes scanned. Row-level access policies stay explicit, and their filters take no part in pruning."],
       claims: ["partitioning-clustering-and-pruning-cost", "partitioning-clustering-and-pruning-access"],
     }),
   ],
-  governance: { text: "Scan size is spend. Tenant or region partitions can support operational isolation and residency planning, while access policies remain explicit and control which rows a user can see.", claims: ["partitioning-clustering-and-pruning-cost", "partitioning-clustering-and-pruning-access"] },
+  governance: { text: "Scan size is spend: BigQuery leaves pruned partitions out of the bytes scanned, which in general reduces query cost. Pruning is not an access rule. Row-level access policies decide which rows a user can see, and their filters take no part in pruning.", claims: ["partitioning-clustering-and-pruning-cost", "partitioning-clustering-and-pruning-access"] },
   closing: {
     pitfalls: [
       "Creating many tiny partitions that add metadata overhead.",

@@ -109,7 +109,7 @@ Rules that keep a scene readable:
 - **One story.** Pick the object the reader follows: a record on a rail, a weight on a curve, a query through a tree. Each stop changes one thing about it.
 - **Reveal, do not redraw.** Put each element in a `group`, and let each step `show` the groups it needs. Elements marked `always` stay. To change an object, define its variants in different groups at the same place.
 - **A record rides.** `ride(line, from, to, label)` moves a record along a rail, a thin line or a line series of a plot. `via` stops are pauses and `then` changes its text when it reaches the final stop. Multiple rides in a step run in source order, one after another. On the floor the record is a puck with its text above. On a plot it is a dot. On flat lines pass `shape: "pill"`.
-- **Use the canvas.** A scene that fills a third of the canvas is too small. Scale the grid positions up until the picture spans most of the width.
+- **Use the canvas.** The check measures it and prints the share of the canvas each stop fills, rails and stops left out. The average must reach 18%, and every stop from the third on must reach 10%. Strong guides sit between 30% and 70%. A single rail with a few labels is not a picture of the concept. Draw the thing itself: the data, the structure, the quantity, the parts and how they change.
 - **Rails run along one grid axis** and turn at right angles on the grid. Put a block's name plate (`at`) on the side no rail leaves from.
 - **Boards need room.** Keep 200 pixels between the centres of two cards on posts. Text in records and plates stays short: 14 characters is a good ceiling.
 - **Records rest on open rail,** clear of blocks, plates and cards. Stop a ride short of a card instead of on it.

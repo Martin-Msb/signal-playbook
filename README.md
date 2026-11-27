@@ -27,7 +27,8 @@ npm install
 npm run dev        # local site
 npm test           # engine, curriculum, ledger rules, copy rules, scene layout and floor collisions for every guide
 npm run build      # static site in apps/site/dist, fails on any curriculum, ledger or copy violation
-node scripts/check-guide.mjs ml/loss-and-optimisation   # one guide on its own: every check, plus contact sheets in .shots/
+node scripts/check-guide.mjs ml/loss-and-optimisation   # one guide on its own: every check, canvas fill, plus contact sheets in .shots/
+node scripts/check-app.mjs                              # drives the built site in a headless browser
 node scripts/brief.mjs --todo                           # concepts that have no guide yet
 npm run preview:single -- ml/tabular-foundation-models  # one guide as a single HTML file in preview/
 npm run preview:app   # the whole site as one HTML file with hash navigation, preview/app.html
@@ -41,7 +42,7 @@ npm run preview:app   # the whole site as one HTML file with hash navigation, pr
 
 | Page | Route | Contents |
 | --- | --- | --- |
-| Learn | `/<track>/<key>/` | One guide: what it builds on and unlocks, route bar, picture, caption, state, and disclosure for detail, pitfalls, questions, governance, lead notes and references. |
+| Learn | `/<track>/<key>/` | One guide, with the stepping bar pinned in view. The last stop leads to the next concept in curriculum order. Shows what it builds on and unlocks, route bar, picture, caption, state, and disclosure for detail, pitfalls, questions, governance, lead notes and references. |
 | Map | `/map/` | The Data, AI and ML lines with one stop per concept: open and planned, read stops, governance and security stops, and what each stop builds on and unlocks. |
 
 ## Build rules

@@ -60,7 +60,7 @@ export default defineGuide({
       show: ["technical"], counters: ["metadata v17", "read", "technical", "not set"],
       rides: [ride("engine-route", "engine-stop", "table-stop", "sales.orders", { via: ["catalogue-stop"], then: "metadata v17" })],
       body: ["Iceberg defines a REST-based Catalog API for managing table metadata and performing catalog operations. The protocol provides one common API for interacting with Iceberg catalogs.",
-        "Apache Polaris implements the Iceberg REST protocol and organizes Iceberg tables in catalogs and namespaces."],
+        "Apache Polaris is a catalog implementation for Iceberg tables, built on the Iceberg REST protocol. Its catalog resources organize Iceberg tables, and namespaces group tables within a catalog."],
       claims: ["catalogs-and-metadata-rest", "catalogs-and-metadata-polaris"],
     }),
     step({
@@ -84,7 +84,7 @@ export default defineGuide({
       caption: "A data discovery view groups assets by business domain. Governed pages define business concepts, and tags organise data for search and filtering.",
       show: ["human"], counters: ["metadata v18", "validated", "business context", "tagged"],
       rides: [ride("reader-route", "reader-start", "reader-end", "Finance: orders", { via: ["catalogue-stop"], then: "Finance domain" })],
-      body: ["AWS Glue Data Catalog business glossaries attach controlled terms to assets, adding business meaning. Unity Catalog discovery helps people find, understand and trust assets with business domains, Pages, and tags that organise data for search and filtering."],
+      body: ["AWS Glue Data Catalog business glossaries, in preview, hold controlled vocabulary terms that can be associated with assets to add business meaning. Unity Catalog discovery helps people find, understand and trust assets with business domains, Pages, and tags that organise data for search and filtering."],
       claims: ["catalogs-and-metadata-glossary", "catalogs-and-metadata-discovery", "catalogs-and-metadata-tags"],
     }),
     step({
@@ -100,7 +100,7 @@ export default defineGuide({
       claims: ["catalogs-and-metadata-commit", "catalogs-and-metadata-discovery", "catalogs-and-metadata-browse"],
     }),
   ],
-  governance: { text: "A catalogue is a governance control point when it carries classifications, business definitions and access metadata. Unity Catalog's governed tags define allowed values, while its BROWSE privilege exposes metadata discovery separately from data access.", claims: ["catalogs-and-metadata-tags", "catalogs-and-metadata-browse"] },
+  governance: { text: "A catalogue is a governance control point when it carries classifications, business definitions and access metadata. In Unity Catalog, administrators define the allowed values of governed tags, and the BROWSE privilege allows metadata discovery without granting access to the underlying data.", claims: ["catalogs-and-metadata-tags", "catalogs-and-metadata-browse"] },
   closing: {
     pitfalls: [
       "Treating the catalogue as a screen of table names while ignoring the current metadata pointer.",

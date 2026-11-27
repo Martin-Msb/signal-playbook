@@ -16,47 +16,47 @@ sources:
     vendor: false
   - id: partitioning-clustering-and-pruning-s4
     title: "Google Cloud: Query partitioned tables"
-    url: https://cloud.google.com/bigquery/docs/querying-partitioned-tables
+    url: https://docs.cloud.google.com/bigquery/docs/querying-partitioned-tables
     kind: primary
     vendor: true
   - id: partitioning-clustering-and-pruning-s5
     title: "Google Cloud: Introduction to clustered tables"
-    url: https://cloud.google.com/bigquery/docs/clustered-tables
+    url: https://docs.cloud.google.com/bigquery/docs/clustered-tables
     kind: primary
     vendor: true
   - id: partitioning-clustering-and-pruning-s6
     title: "Google Cloud: Introduction to BigQuery row-level security"
-    url: https://cloud.google.com/bigquery/docs/row-level-security-intro
+    url: https://docs.cloud.google.com/bigquery/docs/row-level-security-intro
     kind: primary
     vendor: true
 claims:
   - id: partitioning-clustering-and-pruning-partition-transform
     class: A
     sources: [partitioning-clustering-and-pruning-s1, partitioning-clustering-and-pruning-s2]
-    verified: "2026-11-25"
-    text: "Iceberg can transform timestamps to year, month, day or hour partitions. It tracks the relationship between a source column and its partition values, then derives partition filters from query predicates to skip files."
+    verified: "2026-11-27"
+    text: "Iceberg describes partitioning as grouping similar rows together when writing. It can partition timestamps by year, month, day and hour granularity, keeps track of the relationship between a source column and its partition value, and transforms query predicates to partition predicates to skip files. Consumers do not need to know how the table is partitioned."
   - id: partitioning-clustering-and-pruning-prune
     class: A
     sources: [partitioning-clustering-and-pruning-s1, partitioning-clustering-and-pruning-s4]
-    verified: "2026-11-25"
+    verified: "2026-11-27"
     text: "A qualifying filter on a partition column can let a query scan matching partitions and skip the rest."
   - id: partitioning-clustering-and-pruning-cluster
     class: B
     sources: [partitioning-clustering-and-pruning-s5]
-    verified: "2026-11-25"
+    verified: "2026-11-27"
     text: "BigQuery sorts storage blocks by user-defined clustered columns. Filters on those columns can scan only relevant blocks, and column order determines precedence."
   - id: partitioning-clustering-and-pruning-statistics
     class: A
     sources: [partitioning-clustering-and-pruning-s3, partitioning-clustering-and-pruning-s5]
-    verified: "2026-11-25"
-    text: "Parquet page indexes hold page statistics that can be used to skip pages. BigQuery uses block metadata and filter expressions to prune blocks that cannot contain matching values."
+    verified: "2026-11-27"
+    text: "Parquet page indexes store lower and upper bounds for the values of each page, statistics that can be used to skip pages when scanning. BigQuery uses the filter expression and block metadata to prune the blocks scanned by a query."
   - id: partitioning-clustering-and-pruning-cost
     class: B
     sources: [partitioning-clustering-and-pruning-s4]
-    verified: "2026-11-25"
+    verified: "2026-11-27"
     text: "BigQuery excludes pruned partitions from query byte-scan calculations, which can lower query cost."
   - id: partitioning-clustering-and-pruning-access
     class: B
     sources: [partitioning-clustering-and-pruning-s6]
-    verified: "2026-11-25"
-    text: "BigQuery row-level access policies filter which table rows users can see; they are a separate access-control mechanism from partition pruning."
+    verified: "2026-11-27"
+    text: "BigQuery row-level security filters data and enables access to specific rows in a table based on qualifying user conditions. Row-level access policy filters do not participate in query pruning on partitioned and clustered tables."

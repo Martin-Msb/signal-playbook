@@ -16,6 +16,10 @@ const live = new Set(guides.map((g) => g.slug));
 const link = (key: string) => { const k = concept(key)!; return { title: k.title, track: k.track, href: live.has(key) ? `/${k.track}/${key}/` : `/map/#${key}`, open: live.has(key) }; };
 const before = [...c.buildsOn, ...c.seeAlso].map(link), after = unlocks(c.key).map((k) => link(k.key));
 const refs = references(ledger, guide);
+// The guides before and after this one, in curriculum order, so the reader can keep going without the menu.
+const at = guides.findIndex((g) => g.slug === guide.slug);
+const prevG = guides[at - 1], nextG = guides[at + 1];
+const urlOf = (g?: Guide) => (g ? `/${g.track}/${g.slug}/` : undefined);
 const payload = JSON.stringify({
   always: guide.scene.els.filter((e) => e.always).map((e) => e.id),
   steps: guide.steps.map((s) => ({ label: s.label, show: s.show, counters: s.counters })),
@@ -24,7 +28,7 @@ const payload = JSON.stringify({
 const oldest = (ids: string[]) => ids.map((id) => ledger.claim(id).verified).sort()[0];
 const first = guide.steps[0];
 ---
-<sp-guide data-id={guide.id} class={`t-${guide.track}`}>
+<sp-guide data-id={guide.id} class={`t-${guide.track}`} data-prev-url={urlOf(prevG)} data-prev-title={prevG?.title} data-next-url={urlOf(nextG)} data-next-title={nextG?.title}>
   <script is:inline type="application/json" set:html={payload}></script>
   <header class="ghead">
     <a class="badge" href={`/map/#${guide.slug}`} aria-label={`${guide.title} on the map`}>{c.trackName}</a>
@@ -127,8 +131,8 @@ const first = guide.steps[0];
       </div>
 
       <div class="navs">
-        <button class="nb" type="button" data-back disabled aria-label="Previous stop"><Icon name="arrowL" /></button>
-        <button class="nb go" type="button" data-next><span><small>Next stop</small><span data-next-label>{guide.steps[1]?.label}</span></span><Icon name="arrowR" /></button>
+        <button class="nb" type="button" data-back disabled={!prevG} aria-label="Previous stop" title={prevG ? `Previous concept: ${prevG.title}` : undefined}><Icon name="arrowL" /></button>
+        <button class="nb go" type="button" data-next><span><small data-next-kind>Next stop</small><span data-next-label>{guide.steps[1]?.label}</span></span><Icon name="arrowR" /></button>
       </div>
       <p class="keys"><span><kbd>←</kbd> <kbd>→</kbd> stops</span><span><kbd>R</kbd> replay</span>{guide.whatIf && <span><kbd>W</kbd> what if</span>}</p>
     </aside>

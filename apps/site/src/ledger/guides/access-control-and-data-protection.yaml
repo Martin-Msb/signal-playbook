@@ -1,51 +1,68 @@
 sources:
   - {id: access-control-and-data-protection-s1, title: "AWS Lake Formation: Data filtering and cell-level security", url: "https://docs.aws.amazon.com/lake-formation/latest/dg/data-filtering.html", kind: primary, vendor: true}
-  - {id: access-control-and-data-protection-s2, title: "Google Cloud: Introduction to BigQuery row-level security", url: "https://cloud.google.com/bigquery/docs/row-level-security-intro", kind: primary, vendor: true}
-  - {id: access-control-and-data-protection-s3, title: "Google Cloud: Introduction to column-level access control", url: "https://cloud.google.com/bigquery/docs/column-level-security-intro", kind: primary, vendor: true}
+  - {id: access-control-and-data-protection-s2, title: "Google Cloud: Introduction to BigQuery row-level security", url: "https://docs.cloud.google.com/bigquery/docs/row-level-security-intro", kind: primary, vendor: true}
+  - {id: access-control-and-data-protection-s3, title: "Google Cloud: Introduction to column-level access control", url: "https://docs.cloud.google.com/bigquery/docs/column-level-security-intro", kind: primary, vendor: true}
   - {id: access-control-and-data-protection-s4, title: "Apache Iceberg: REST Catalog Protocol", url: "https://iceberg.apache.org/docs/nightly/rest-protocol/", kind: primary, vendor: false}
   - {id: access-control-and-data-protection-s5, title: "AWS KMS: Cryptography essentials", url: "https://docs.aws.amazon.com/kms/latest/developerguide/kms-cryptography.html", kind: primary, vendor: true}
   - {id: access-control-and-data-protection-s6, title: "AWS Lake Formation: Logging API calls with AWS CloudTrail", url: "https://docs.aws.amazon.com/lake-formation/latest/dg/logging-using-cloudtrail.html", kind: primary, vendor: true}
   - {id: access-control-and-data-protection-s7, title: "EUR-Lex: Regulation (EU) 2016/679, Article 32", url: "https://eur-lex.europa.eu/eli/reg/2016/679", kind: primary, vendor: false}
   - {id: access-control-and-data-protection-s8, title: "AWS IAM: Define permissions based on attributes with ABAC authorization", url: "https://docs.aws.amazon.com/IAM/latest/UserGuide/introduction_attribute-based-access-control.html", kind: primary, vendor: true}
   - {id: access-control-and-data-protection-s9, title: "NIST SP 800-53 Rev. 5.1: Security and Privacy Controls", url: "https://csrc.nist.gov/CSRC/media/Projects/risk-management/800-53%20Downloads/800-53r5/SP_800-53_v5_1-derived-OSCAL.pdf", kind: primary, vendor: false}
+  - {id: access-control-and-data-protection-s10, title: "AWS Lake Formation: Tag-based access control", url: "https://docs.aws.amazon.com/lake-formation/latest/dg/tag-based-access-control.html", kind: primary, vendor: true}
+  - {id: access-control-and-data-protection-s11, title: "Google Cloud: Introduction to data masking", url: "https://docs.cloud.google.com/bigquery/docs/column-data-masking-intro", kind: primary, vendor: true}
 claims:
   - id: access-control-and-data-protection-filtering
     class: B
     sources: [access-control-and-data-protection-s1]
-    verified: "2026-11-25"
-    text: "Lake Formation data filters can restrict query results by columns, rows, or both, and apply when SELECT permission is granted."
+    verified: "2026-11-27"
+    text: "Lake Formation data filters implement column-level, row-level and cell-level security. A data filter holds a column specification, the columns to include or exclude in query results, and a row filter expression that specifies the rows to include. Filters apply only to read operations."
+  - id: access-control-and-data-protection-row-policies
+    class: B
+    sources: [access-control-and-data-protection-s2]
+    verified: "2026-11-27"
+    text: "BigQuery row-level access policies act as filters that hide or display rows of a table for a grantee list of users or groups, with a filter expression that functions like a WHERE clause. Users who are not in the grantee list cannot see any rows."
   - id: access-control-and-data-protection-policy-tags
     class: B
-    sources: [access-control-and-data-protection-s2, access-control-and-data-protection-s3]
-    verified: "2026-11-25"
-    text: "BigQuery row policies filter rows using conditions for specified users or groups, while column policy tags are checked at query time and require both dataset permission and tag permission."
+    sources: [access-control-and-data-protection-s3]
+    verified: "2026-11-27"
+    text: "BigQuery column-level access control uses policy tags on columns to create policies that check, at query time, whether a user has proper access. A user needs both dataset permission and policy tag permission, and without the Fine-Grained Reader role the column data is not available to the user."
+  - id: access-control-and-data-protection-masking
+    class: B
+    sources: [access-control-and-data-protection-s11]
+    verified: "2026-11-27"
+    text: "BigQuery data masking selectively obscures column data for user groups while still allowing them access to the column. A masking rule is applied to a column at query runtime, based on the role of the user running the query."
   - id: access-control-and-data-protection-authorization
     class: A
     sources: [access-control-and-data-protection-s8]
-    verified: "2026-11-25"
-    text: "Role-based access control assigns permissions through job-function policies, while attribute-based access control can grant access when principal and resource attributes match."
+    verified: "2026-11-27"
+    text: "Role-based access control defines permissions based on a person's job function. Attribute-based access control defines permissions based on attributes, which AWS calls tags, and a policy can allow operations when the principal's tag matches the resource tag."
+  - id: access-control-and-data-protection-tags
+    class: B
+    sources: [access-control-and-data-protection-s10]
+    verified: "2026-11-27"
+    text: "Lake Formation tag-based access control defines permissions based on attributes called LF-Tags. LF-Tags attach to Data Catalog resources, columns inherit them from tables, and an operation is allowed when the principal has been granted a tag value that matches the resource tag value."
   - id: access-control-and-data-protection-credentials
     class: B
     sources: [access-control-and-data-protection-s4]
-    verified: "2026-11-25"
-    text: "The Iceberg REST protocol can return short-lived, table-scoped storage credentials so clients do not need long-lived storage credentials of their own."
+    verified: "2026-11-27"
+    text: "In the Iceberg REST protocol the catalog server can return short-lived, table-scoped storage credentials in the load-table response, so that clients do not need long-lived storage credentials of their own. Each credential is scoped to a table's storage prefixes, and vended credentials expire."
   - id: access-control-and-data-protection-envelope
     class: A
     sources: [access-control-and-data-protection-s5]
-    verified: "2026-11-25"
-    text: "Envelope encryption encrypts data with a data key, then encrypts that data key under another key."
+    verified: "2026-11-27"
+    text: "Envelope encryption is the practice of encrypting plaintext data with a data key, and then encrypting the data key under another key. AWS KMS keys never leave its hardware security modules unencrypted, and to use a KMS key a caller must call AWS KMS."
   - id: access-control-and-data-protection-audit
     class: B
     sources: [access-control-and-data-protection-s6]
-    verified: "2026-11-25"
-    text: "CloudTrail records Lake Formation API calls with information about the requested action, who made it, when it occurred, and additional details."
+    verified: "2026-11-27"
+    text: "From the information CloudTrail collects one can determine the request made to Lake Formation, the IP address it came from, who made it and when. Lake Formation issues temporary, scoped-down credentials to query engines, and a GetDataAccess event is logged whenever a principal or integrated service requests temporary credentials to access data."
   - id: access-control-and-data-protection-law
     class: A
     sources: [access-control-and-data-protection-s7]
-    verified: "2026-11-25"
-    text: "GDPR Article 32 calls for security measures appropriate to the risk, including encryption where appropriate, confidentiality, integrity, availability and resilience, and regular testing of security measures."
+    verified: "2026-11-27"
+    text: "GDPR Article 32 calls for technical and organisational measures that ensure a level of security appropriate to the risk, including as appropriate the pseudonymisation and encryption of personal data and a process for regularly testing, assessing and evaluating the effectiveness of the measures."
   - id: access-control-and-data-protection-governance
     class: A
     sources: [access-control-and-data-protection-s9]
-    verified: "2026-11-25"
-    text: "NIST SP 800-53 AC-5 calls for access authorisations that support separation of duties, and AC-6 calls for least privilege limited to access necessary for assigned tasks."
+    verified: "2026-11-27"
+    text: "NIST SP 800-53 AC-6 employs least privilege, allowing only authorised accesses that are necessary to accomplish assigned tasks. AC-5 defines access authorisations to support separation of duties, which includes that personnel who administer access control functions do not also administer audit functions. AU-3 requires audit records to establish what type of event occurred, when and where, its source, its outcome and the identities associated with it."

@@ -250,6 +250,9 @@ sp-guide[data-open="pitfalls"] [data-panel="pitfalls"], sp-guide[data-open="ques
 .callout { background: var(--tw); border-radius: 10px; padding: 8px 12px; }
 .callout b { display: block; font-size: 11.5px; letter-spacing: .07em; text-transform: uppercase; color: var(--tc); }
 .navs { display: grid; grid-template-columns: auto 1fr; gap: 10px; }
+/* The stepping controls stay in view: pinned to the bottom of the window on every guide. */
+html.js .navs { position: fixed; left: 50%; bottom: 14px; transform: translateX(-50%); width: min(520px, calc(100vw - 24px)); z-index: 20; padding: 8px; border-radius: 20px; background: var(--card); border: 1.5px solid var(--rule); box-shadow: var(--shadow); }
+html.js sp-guide { display: block; padding-bottom: 96px; }
 .nb { height: 52px; border-radius: 14px; border: 2px solid var(--ink); background: var(--card); font-weight: 800; font-size: 15px; display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 0 16px; color: var(--ink); }
 .nb.go { background: var(--ink); color: var(--paper); text-align: left; }
 .nb small { display: block; font-size: 12px; font-weight: 700; opacity: .7; }
@@ -352,4 +355,9 @@ html:not(.js) .navs, html:not(.js) .keys, html:not(.js) .chips { display: none; 
 }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition: none !important; }
+}
+
+/* On a desktop window the picture, its controls and the pinned stepping bar all fit without scrolling. */
+@media (min-width: 1181px) and (min-height: 700px) {
+  .stage .scene svg { max-height: max(300px, calc(100vh - 480px)); }
 }

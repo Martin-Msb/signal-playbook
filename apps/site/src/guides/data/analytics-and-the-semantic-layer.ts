@@ -56,7 +56,7 @@ export default defineGuide({
       caption: "Finance asks for net sales by month and product category. The metric stays fixed while its grouping changes.",
       show: ["dimensions"], counters: ["1,639 kr", "1 formula", "date, product", "all rows"],
       rides: [ride("metric-flow", "warehouse", "serve", "category: sofas")],
-      body: ["dbt semantic models define entities as join keys and dimensions as ways to group or filter metrics. Apache Ossie describes datasets, fields, relationships and metrics in a JSON or YAML semantic model that can be exchanged between tools."],
+      body: ["dbt semantic models define entities as join keys and dimensions as ways to group or slice metrics. Apache Ossie describes datasets, fields, relationships and metrics in a JSON or YAML semantic model that can be exchanged between tools."],
       claims: ["analytics-and-the-semantic-layer-dbt", "analytics-and-the-semantic-layer-ossie"],
     }),
     step({
@@ -64,7 +64,7 @@ export default defineGuide({
       caption: "A dashboard, an ad hoc query and a notebook ask the model for the same metric and dimensions.",
       show: ["dimensions", "exchange"], counters: ["1,639 kr", "1 formula", "3", "all rows"],
       rides: [ride("metric-flow", "metric", "serve", "net sales")],
-      body: ["BI tools, self-service analytics and notebooks can be separate consumers of a shared model. dbt exposes metrics through integrations and APIs. Apache Ossie is an Apache incubator project for exchanging semantic metadata across analytics, AI and BI tools."],
+      body: ["The three consumers here are illustrative. dbt says correctly defined semantic models and metrics can be used downstream with Semantic Layer integrations. Apache Ossie, an incubating Apache project, aims to enable exchange and reuse of semantic models across AI and BI applications."],
       claims: ["analytics-and-the-semantic-layer-dbt", "analytics-and-the-semantic-layer-ossie"],
     }),
     step({
@@ -72,7 +72,7 @@ export default defineGuide({
       caption: "A certified semantic model identifies a reviewed source. A Finance role restricts the rows its user can retrieve.",
       show: ["access", "cert"], counters: ["1,639 kr", "1 formula", "3", "own region"],
       rides: [ride("metric-flow", "metric", "serve", "net sales")],
-      body: ["Power BI lets designated experts certify semantic models and displays a certified badge. Its row-level security filters model rows by role. For shared semantic models, the role's filters remain in effect for users connecting to build reports."],
+      body: ["Power BI admins can designate experts who certify semantic models, and certified models display a badge. Row-level security filters model rows by role and stays in effect for users building reports on a shared model. It restricts only users with Viewer permissions, not workspace Admin, Member or Contributor roles."],
       claims: ["analytics-and-the-semantic-layer-certification", "analytics-and-the-semantic-layer-rls"],
     }),
     step({
@@ -87,7 +87,7 @@ export default defineGuide({
       claims: ["analytics-and-the-semantic-layer-certification", "analytics-and-the-semantic-layer-rls"],
     }),
   ],
-  governance: { text: "Certify the reviewed semantic model that contains the metric, and test row-level access with the roles used by each BI consumer. Certification indicates trust; row filtering controls which records a user can retrieve.", claims: ["analytics-and-the-semantic-layer-certification", "analytics-and-the-semantic-layer-rls"] },
+  governance: { text: "Certify the reviewed semantic model that contains the metric, and test row-level access with the roles used by each BI consumer. Certification signals a trusted source. Row-level security restricts rows only for users with Viewer permissions, so review workspace roles as well.", claims: ["analytics-and-the-semantic-layer-certification", "analytics-and-the-semantic-layer-rls"] },
   closing: {
     pitfalls: [
       "Defining the same metric separately in dashboards and notebooks.",

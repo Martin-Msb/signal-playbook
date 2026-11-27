@@ -70,7 +70,7 @@ export default defineGuide({
       caption: "The SQL job reads orders and writes daily_sales. The table-level path connects the output to the process that made it.",
       show: ["table-lineage"], counters: ["1", "table path", "unknown", "1 report"],
       rides: [ride("flow", "orders", "sales", "4470")],
-      body: ["OpenLineage represents a process as a job with input and output datasets, and a run as one instance of that job. Run events record observed states. The data lineage facet can also describe a structural relationship that has no natural run event."],
+      body: ["OpenLineage represents a process as a job with input and output datasets, and a run as one instance of that job. Run events record observed states. The Lineage Dataset Facet also suits a structural relationship that has no natural event job, such as a view derived from tables."],
       claims: ["lineage-run-model", "lineage-table-graph"],
     }),
     step({
@@ -94,7 +94,7 @@ export default defineGuide({
       caption: "If item_price is renamed, the SQL dependency fails and the Finance report loses its source. The graph shows affected downstream fields.",
       show: ["table-lineage", "impact"], counters: ["1", "2 inputs to net_sales", "v3", "1 affected report"],
       rides: [ride("flow", "orders", "finance", "item_price", { tone: "alert" })],
-      body: ["The Lineage Dataset Facet records the datasets, jobs and fields from which an output derives. Inspecting those relationships supports impact analysis before changing an input."],
+      body: ["The Lineage Dataset Facet records the datasets, jobs and fields from which an output derives. OpenLineage says metadata about datasets, jobs and runs gives users the information to understand the impact of changes."],
       claims: ["lineage-table-graph", "lineage-impact"],
     }),
     step({
@@ -109,7 +109,7 @@ export default defineGuide({
       claims: ["lineage-table-graph", "lineage-run-model", "lineage-gdpr-record"],
     }),
   ],
-  governance: { text: "Lineage supports audit and impact analysis by recording where data comes from and where it flows. For personal data, maintain the processing record required by Article 30, including purposes, data categories, recipients, and where possible erasure time limits and security measures.", claims: ["lineage-impact", "lineage-gdpr-record"] },
+  governance: { text: "Lineage metadata about datasets, jobs and runs helps teams find the root cause of issues and understand the impact of changes. For personal data, maintain the processing record required by Article 30, including purposes, data categories, recipients, and where possible erasure time limits and security measures.", claims: ["lineage-impact", "lineage-gdpr-record"] },
   closing: {
     pitfalls: [
       "Treating table-level lineage as enough to explain a derived column.",

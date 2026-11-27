@@ -57,7 +57,7 @@ export default defineGuide({
       show: ["v1", "v2"], counters: ["2", "backward", "Finance reads v1", "none"],
       rides: [ride("orders", "produced", "registry", "v2: add currency")],
       body: ["Backward compatibility lets a consumer using the new schema read data written with the old schema. Forward compatibility lets a consumer using the old schema read data written with the new schema. Full requires both.",
-        "Confluent Schema Registry can check a new schema version against earlier versions before accepting it. These rules are format-specific: Avro and Protocol Buffers have their own evolution constraints."],
+        "Confluent Schema Registry compares a new schema version against previous versions and checks compatibility before accepting it. Compatibility rules differ between Avro, Protobuf and JSON Schema."],
       claims: ["schema-evolution-and-data-contracts-modes", "schema-evolution-and-data-contracts-compatibility"],
     }),
     step({
@@ -74,7 +74,7 @@ export default defineGuide({
       caption: "Finance can read the new record shape, but still needs to know its quality, owner and permitted use.",
       show: ["v2", "contract"], counters: ["2", "passes", "Finance reads v2", "Data team"],
       rides: [ride("orders", "landed", 17, "4471 USD 899")],
-      body: ["The Open Data Contract Standard defines an agreement between a producer and consumers. It includes sections for schema, data quality, team, roles and service-level agreement."],
+      body: ["In the Open Data Contract Standard, a data contract defines the agreement between a data producer and consumers. Its sections include schema, data quality, team, roles and service-level agreement."],
       claims: ["schema-evolution-and-data-contracts-odcs"],
     }),
     step({
@@ -85,11 +85,11 @@ export default defineGuide({
       body: [{ pair: {
         left: { label: "Before release", items: ["Choose compatibility for real readers", "Check the schema version"] },
         right: { label: "In the contract", items: ["Name an owner and quality level", "State permitted use"] },
-      } }, "The Open Data Contract Standard has sections for team, roles, data quality and service-level agreement. The contract identifies who owns the agreement and which expectations consumers rely on."],
+      } }, "The Open Data Contract Standard has sections for team, roles, data quality and service-level agreement. Its description fields record the intended purpose of the data, recommended usage and limitations for data use."],
       claims: ["schema-evolution-and-data-contracts-governance"],
     }),
   ],
-  governance: { text: "A data contract names the team and roles, quality expectations and service-level agreement. State permitted use with the contract so consumers know the conditions attached to the data they receive.", claims: ["schema-evolution-and-data-contracts-governance"] },
+  governance: { text: "In the Open Data Contract Standard, a data contract has sections for team, roles, data quality and service-level agreement. Its description fields state the intended purpose, recommended usage and limitations for data use, which is where permitted use is recorded.", claims: ["schema-evolution-and-data-contracts-governance"] },
   closing: {
     pitfalls: [
       "Assuming an added field is safe for every schema format and reader.",

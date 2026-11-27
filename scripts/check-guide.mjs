@@ -80,6 +80,27 @@ if (!flags.includes("--no-shots")) {
     const p = await browser.newPage({ viewport: { width: 1471, height: 1244 }, colorScheme: theme, reducedMotion: "reduce" });
     await p.goto(pathToFileURL(page).href);
     await p.evaluate(() => document.fonts.ready);
+    if (theme === "light") {
+      // How much of the canvas each stop's picture fills, rails and stops left out.
+      // A stop that is one rail and a few labels leaves most of the canvas empty: its picture is not doing the teaching.
+      const fill = await p.evaluate(() => [...document.querySelectorAll(".frame svg")].map((svg) => {
+        const f = svg.getBoundingClientRect(), C = 48, R = 27, hit = new Uint8Array(C * R);
+        svg.querySelectorAll(".world .el.on").forEach((el) => {
+          if (["line", "stop", "arrow"].includes(el.dataset.kind)) return;
+          const r = el.getBoundingClientRect();
+          if (!r.width || !r.height) return;
+          const c0 = Math.max(0, Math.floor(((r.left - f.left) / f.width) * C)), c1 = Math.min(C - 1, Math.floor(((r.right - f.left) / f.width) * C));
+          const r0 = Math.max(0, Math.floor(((r.top - f.top) / f.height) * R)), r1 = Math.min(R - 1, Math.floor(((r.bottom - f.top) / f.height) * R));
+          for (let y = r0; y <= r1; y++) for (let x = c0; x <= c1; x++) hit[y * C + x] = 1;
+        });
+        return Math.round((hit.reduce((a, b) => a + b, 0) / (C * R)) * 100);
+      }));
+      console.log(`  canvas filled per stop, %: ${fill.join("  ")}`);
+      // The opening stops may be bare: they show the situation before the concept arrives.
+      const mean = Math.round(fill.reduce((a, b) => a + b, 0) / fill.length);
+      if (mean < 18) { problems.push(`the picture fills ${mean}% of the canvas on average, below 18%. A rail with a few labels is not a picture of the concept.`); console.log(`  - too sparse: ${mean}% of the canvas filled on average, needs 18%`); }
+      fill.forEach((v, i) => { if (i >= 2 && v < 10) { problems.push(`stop ${i + 1}: the picture fills ${v}% of the canvas, below 10%`); console.log(`  - stop ${i + 1} is too sparse: ${v}% filled, needs 10%`); } });
+    }
     await p.screenshot({ path: join(out, `${key}-${theme}.png`) });
     await p.close();
     console.log(`sheet: ${join(out, `${key}-${theme}.png`)}`);

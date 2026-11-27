@@ -57,8 +57,8 @@ export default defineGuide({
       caption: "The check must finish before the sales table can be built, and the table must exist before the report is published.",
       show: ["graph", "engine"], counters: ["1 ready at first", "0", "1", "today"],
       rides: [ride("daily", "begin", 0.74, "4471 web 899", { via: ["extract", "validate", "model"] })],
-      body: ["Apache Airflow represents a workflow as a DAG of tasks and dependencies. By default, a task runs when its upstream tasks have succeeded. Independent tasks can run without waiting for unrelated work.",
-        "Dagster's asset definitions declare upstream assets and compute an asset's contents. This asset-based view makes the data products and their dependencies part of the workflow."],
+      body: ["Apache Airflow represents a workflow as a DAG of tasks and dependencies. By default, a task runs when all of its upstream tasks have succeeded.",
+        "Dagster's asset definitions declare upstream assets and compute an asset's contents. Dagster tracks those dependencies and handles the asset's execution within the pipeline."],
       claims: ["orchestration-tasks", "orchestration-dagster-assets"],
     }),
     step({
@@ -66,7 +66,7 @@ export default defineGuide({
       caption: "The sales build fails after the check passes. Its retry runs that task again, then the dependent report can continue.",
       show: ["engine", "failed"], counters: ["0 downstream", "1", "2 attempts", "today"],
       rides: [ride("daily", "begin", 0.62, "4471", { via: ["extract", "validate"], then: "retry" })],
-      body: ["A retry policy belongs to the task that can fail. Airflow and Prefect configure retry counts for work; delay and error-specific retry behaviour can also be set. Set a retry limit, then review a task that remains failed."],
+      body: ["By default, Airflow retries a failed task with a fixed count and delay, and a task with attempts left waits in the up-for-retry state. Prefect sets the count with `retries` and a wait with `retry_delay_seconds`, can scope retries to individual tasks, and can decide from the error with `retry_condition_fn`. Set a retry limit, then review a task that remains failed."],
       claims: ["orchestration-retries", "orchestration-prefect-retries"],
     }),
     step({
@@ -74,7 +74,7 @@ export default defineGuide({
       caption: "Finance corrects October's returns. The workflow runs again for the chosen date range and records each run against its period.",
       show: ["graph", "engine", "backfill", "history"], counters: ["4", "0", "3 runs", "1-31 Oct"],
       rides: [ride("daily", "begin", 0.74, "4471 Oct", { via: ["extract", "validate", "model"] })],
-      body: ["Airflow backfill creates workflow runs for past dates in a time-based schedule. Its reprocessing setting controls whether existing runs are skipped, failed runs are rerun, or all runs are recreated. A backfill can be limited to protect scheduling capacity."],
+      body: ["Airflow backfill creates workflow runs for past dates in a time-based schedule. Its reprocessing setting controls whether existing runs are skipped, failed runs are rerun, or completed and failed runs are recreated. Setting `max_active_runs` on a backfill controls how many of its runs execute concurrently."],
       claims: ["orchestration-backfill"],
     }),
     step({
@@ -82,7 +82,7 @@ export default defineGuide({
       caption: "The run records its period, task states and attempts. Operations can trace the report to the work that produced it.",
       show: ["graph", "engine", "history"], counters: ["4", "0", "3 runs", "recorded"],
       rides: [ride("daily", "begin", 0.74, "4471 Oct", { via: ["extract", "validate", "model"] })],
-      body: ["Airflow's run view includes the run's logical date, status and task-level states, start and end dates, and try number. The Dagster asset model records what data assets depend on upstream assets. Use the run record to establish which inputs and task outcomes led to a published result."],
+      body: ["Airflow's Dag Run view shows the run's logical date, run type, duration and data interval, and lists each task's state, start and end dates, and try number. A Dagster asset definition names the upstream assets its contents are derived from. Use the run record to establish which inputs and task outcomes led to a published result."],
       claims: ["orchestration-run-history", "orchestration-dagster-assets"],
     }),
     step({

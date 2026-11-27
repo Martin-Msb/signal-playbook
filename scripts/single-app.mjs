@@ -35,7 +35,7 @@ const runtime = runtimeSrc ? readFileSync(join(dist, runtimeSrc), "utf8") : pick
 const relink = (html) => {
   for (const p of pages) {
     html = html.replaceAll(new RegExp(`href="/${p.track}/${p.slug}/#step-\\d+"`, "g"), `href="#${p.id}"`);
-    html = html.replaceAll(`href="/${p.track}/${p.slug}/"`, `href="#${p.id}"`);
+    html = html.replaceAll(`href="/${p.track}/${p.slug}/"`, `href="#${p.id}"`).replaceAll(`-url="/${p.track}/${p.slug}/"`, `-url="#${p.id}"`);
   }
   return html.replace(/href="\/map\/#[a-z0-9-]+"/g, 'href="#map"').replaceAll('href="/map/"', 'href="#map"').replaceAll('href="/"', `href="#${first}"`);
 };

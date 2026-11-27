@@ -50,7 +50,7 @@ export default defineGuide({
       caption: 'A decoder-only transformer masks later positions. “Pending” can use the order and refund context; earlier positions cannot use a word that has not arrived yet.',
       show: ['first', 'masked'], counters: ['4', '2', 'none', 'not yet'],
       rides: [ride('flow', 0.2, 0.9, 'refund')],
-      body: ['Decoder-only models use a causal mask so each position is computed from the current and preceding positions. This supports next-token prediction without letting the model look ahead.'],
+      body: ['The Transformer decoder masks self-attention so that no position attends to subsequent positions. GPT-2 is a causal transformer language model, pretrained to predict the next word from all the previous words.'],
       claims: ['attention-and-the-transformer-causal-mask'],
     }),
     step({
@@ -58,7 +58,7 @@ export default defineGuide({
       caption: 'For each position, attention scores the available positions, turns the scores into weights, then combines their value vectors into a new representation.',
       show: ['first'], counters: ['4', '2', 'none', 'not yet'],
       rides: [ride('flow', 0.35, 0.92, 'pending')],
-      body: ['Self-attention relates positions in one sequence. Query and key dot products are scaled and normalised into weights on the value vectors. Multiple attention heads learn different relationships.'],
+      body: ['Self-attention relates positions in one sequence. Query and key dot products are scaled and normalised into weights on the value vectors. Multi-head attention lets the model attend to different representation subspaces at different positions.'],
       claims: ['attention-and-the-transformer-attention-weights'],
     }),
     step({
@@ -74,7 +74,7 @@ export default defineGuide({
       caption: 'Attention can only use tokens present in the model call. A long conversation competes for context space, and an omitted detail cannot shape the current representation.',
       show: ['third'], counters: ['4 of finite window', '2', 'none', 'not yet'],
       rides: [ride('flow', 0.46, 0.98, 'contextual state')],
-      body: ['Context length is a model limit measured in tokens. Attention provides a route for information in the context to influence a token, but it does not guarantee that every relevant detail will be used.'],
+      body: ['GPT-3 models use a context window of 2048 tokens, and few-shot examples are limited to as many as fit in it. Text that does not fit in the window is not part of the input that attention reads.'],
       claims: ['attention-and-the-transformer-context-limit'],
     }),
     step({
@@ -83,16 +83,16 @@ export default defineGuide({
       rides: [ride('flow', 0.52, 1, 'evaluate in context')],
       body: [{ pair: {
         left: { label: 'Check', items: ['Representative prompts and contexts', 'Errors across repeated cases', 'Changes after model updates'] },
-        right: { label: 'Avoid assuming', items: ['Attention weights explain a decision', 'A longer context guarantees recall', 'A passing sample proves reliability'] },
+        right: { label: 'Avoid assuming', items: ['Attention weights explain a decision', 'Text outside the window is read', 'A passing sample proves reliability'] },
       } }],
-      claims: ['attention-and-the-transformer-evaluation'],
+      claims: ['attention-and-the-transformer-evaluation', 'attention-and-the-transformer-explanation'],
     }),
   ],
-  governance: { text: 'The model’s internal computation is not a dependable explanation of its decision. Document and repeat evaluations in the intended context, including uncertainty and limitations.', claims: ['attention-and-the-transformer-evaluation'] },
+  governance: { text: 'Attention weights are not a dependable explanation of a model’s decision. Test the system in conditions similar to deployment, before release and regularly in operation, and document results with uncertainty measures and limitations.', claims: ['attention-and-the-transformer-explanation', 'attention-and-the-transformer-evaluation'] },
   closing: {
     pitfalls: [
       'Treating attention weights as a complete explanation of why the model answered.',
-      'Assuming a larger context window means the model will recall every detail.',
+      'Assuming text that did not fit in the context window still shapes the answer.',
       'Testing only an average case instead of the risks of the support workflow.',
     ],
     questions: [

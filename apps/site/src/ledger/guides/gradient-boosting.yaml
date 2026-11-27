@@ -1,4 +1,13 @@
 sources:
   - {id: gradient-boosting-s1, title: "XGBoost documentation: Monotonic constraints", url: "https://xgboost.readthedocs.io/en/stable/tutorials/monotonic.html", kind: primary, vendor: false}
+  - {id: gradient-boosting-s2, title: "Google for Developers: Decision Forests, Overfitting, regularization, and early stopping", url: "https://developers.google.com/machine-learning/decision-forests/overfitting-gbdt", kind: primary, vendor: false}
+  - {id: gradient-boosting-s3, title: "XGBoost documentation: Python package introduction, Early stopping", url: "https://xgboost.readthedocs.io/en/stable/python/python_intro.html", kind: primary, vendor: false}
+  - {id: gradient-boosting-s4, title: "LightGBM documentation: Welcome to LightGBM's documentation", url: "https://lightgbm.readthedocs.io/en/stable/", kind: primary, vendor: false}
+  - {id: gradient-boosting-s5, title: "CatBoost: project repository README", url: "https://github.com/catboost/catboost", kind: primary, vendor: false}
 claims:
   - {id: gradient-boosting-monotonic, class: A, sources: [gradient-boosting-s1], verified: "2026-11-25", text: "XGBoost can enforce monotonicity constraints on any features used in a boosted model."}
+  - {id: gradient-boosting-can-overfit, class: A, sources: [gradient-boosting-s2], verified: "2026-11-27", text: "Unlike random forests, gradient boosted trees can overfit, so regularisation and early stopping using a validation dataset can be applied."}
+  - {id: gradient-boosting-validation-turns, class: A, sources: [gradient-boosting-s2], verified: "2026-11-27", text: "In Google's worked example, training loss gradually decreases as the number of decision trees increases, while validation loss decreases only until about 40 trees and then increases."}
+  - {id: gradient-boosting-early-stopping, class: B, sources: [gradient-boosting-s3], verified: "2026-11-27", text: "With a validation set, XGBoost can use early stopping to find the optimal number of boosting rounds: the model trains until the validation score stops improving."}
+  - {id: gradient-boosting-lightgbm, class: B, sources: [gradient-boosting-s4], verified: "2026-11-27", text: "LightGBM is a gradient boosting framework that uses tree based learning algorithms."}
+  - {id: gradient-boosting-catboost, class: B, sources: [gradient-boosting-s5], verified: "2026-11-27", text: "CatBoost is a machine learning method based on gradient boosting over decision trees."}

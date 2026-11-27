@@ -30,8 +30,8 @@ class SpGuide extends HTMLElement {
     this.classList.add("live");
     const on = (sel: string, ev: string, fn: (e: Event, el: HTMLElement) => void) =>
       this.querySelectorAll<HTMLElement>(sel).forEach((el) => el.addEventListener(ev, (e) => fn(e, el)));
-    on("[data-back]", "click", () => this.go(this.i - 1));
-    on("[data-next]", "click", () => this.go(this.i + 1));
+    on("[data-back]", "click", () => this.step(-1));
+    on("[data-next]", "click", () => this.step(1));
     on("[data-replay]", "click", () => this.replay());
     on("[data-goto]", "click", (_, el) => this.go(Number(el.dataset.goto)));
     on("[data-whatif]", "click", () => this.toggleWhatIf());
@@ -41,8 +41,8 @@ class SpGuide extends HTMLElement {
     document.addEventListener("keydown", (e) => {
       const t = (e.target as HTMLElement | null)?.tagName;
       if (t === "INPUT" || t === "TEXTAREA" || t === "SELECT" || this.offsetParent === null || e.metaKey || e.ctrlKey || e.altKey) return;
-      if (e.key === "ArrowRight") this.go(this.i + 1);
-      else if (e.key === "ArrowLeft") this.go(this.i - 1);
+      if (e.key === "ArrowRight") this.step(1);
+      else if (e.key === "ArrowLeft") this.step(-1);
       else if (e.key === "r" || e.key === "R") this.replay();
       else if (e.key === "w" || e.key === "W") this.toggleWhatIf();
       else if (e.key === "Escape" && this.dataset.open) this.panel(this.dataset.open);
@@ -105,6 +105,14 @@ class SpGuide extends HTMLElement {
     scene.scrollTo({ left: Math.max(0, (x / vb) * svg.clientWidth - scene.clientWidth / 2), behavior: reduced() ? "auto" : "smooth" });
   }
 
+  /** One stop forward or back. Past the last stop it opens the next concept, before the first the previous one. */
+  private step(d: 1 | -1) {
+    const n = this.data.steps.length, to = this.i + d;
+    const url = to >= n ? this.dataset.nextUrl : to < 0 ? this.dataset.prevUrl : undefined;
+    if (url) location.href = url;
+    else this.go(to);
+  }
+
   private go(i: number, writeHash = true) {
     const steps = this.data.steps;
     if (i < 0 || i >= steps.length || i === this.i) return;
@@ -134,9 +142,11 @@ class SpGuide extends HTMLElement {
     const back = this.querySelector<HTMLButtonElement>("[data-back]");
     const next = this.querySelector<HTMLButtonElement>("[data-next]");
     const label = this.querySelector("[data-next-label]");
-    if (back) back.disabled = i === 0;
-    if (next) next.disabled = i === steps.length - 1;
-    if (label) label.textContent = i === steps.length - 1 ? "Last stop" : steps[i + 1].label;
+    const last = i === steps.length - 1, kind = this.querySelector("[data-next-kind]");
+    if (back) { back.disabled = i === 0 && !this.dataset.prevUrl; back.setAttribute("aria-label", i === 0 && this.dataset.prevTitle ? `Previous concept: ${this.dataset.prevTitle}` : "Previous stop"); }
+    if (next) next.disabled = last && !this.dataset.nextUrl;
+    if (kind) kind.textContent = last && this.dataset.nextTitle ? "Next concept" : "Next stop";
+    if (label) label.textContent = last ? this.dataset.nextTitle ?? "Last stop" : steps[i + 1].label;
     const w = this.data.whatIf;
     this.querySelectorAll<HTMLButtonElement>("button.wif[data-whatif]").forEach((wb) => { wb.disabled = !w || i < w.from; wb.setAttribute("aria-pressed", "false"); });
     if (writeHash && this.dataset.hash !== "off") history.replaceState(null, "", `#step-${i + 1}`);

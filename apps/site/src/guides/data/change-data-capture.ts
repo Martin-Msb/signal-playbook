@@ -44,11 +44,11 @@ export default defineGuide({
   steps: [
     step({
       id: "poll", label: "The gap", kind: "problem", title: "A table query sees only a moment",
-      caption: "A query returns the current row, but not each change that led to it. If a delete happens between polls, the downstream copy may never learn what to remove.",
+      caption: "A query returns the current row, but not each change that led to it. A row deleted between polls leaves nothing for the next query to return.",
       show: [], counters: ["table scan", "no", "none", "no"],
       rides: [ride("flow", "db-stop", 0.84, "4471 paid")],
-      body: ["A snapshot query can copy what exists now. It does not by itself preserve the sequence of inserts, updates and deletes that produced the current table."],
-      claims: ["change-data-capture-log", "change-data-capture-operations"],
+      body: ["A query can copy what exists now. Debezium contrasts polling with log-based capture, which it says ensures that all data changes are captured and can capture deletes."],
+      claims: ["change-data-capture-polling"],
     }),
     step({
       id: "log", label: "The log", kind: "idea", title: "Committed changes leave a sequence",
@@ -71,7 +71,7 @@ export default defineGuide({
       caption: "An update creates an event for the changed row. Debezium reads the log and writes change records; the consumer applies each event to its copy.",
       show: ["stream", "debezium"], counters: ["log read", "update", "snapshot plus log", "no"],
       rides: [ride("flow", "db-stop", 0.84, "4471 refunded", { via: ["log-stop", "cdc-stop"] })],
-      body: ["Log-based capture reads database changes rather than repeatedly querying whole source tables. Debezium is a common implementation. The outbox pattern records an application event in an outbox table in the same service database transaction; Debezium can capture that table and route its records as events."],
+      body: ["The Debezium PostgreSQL connector captures committed row-level inserts, updates and deletes and produces change event records. The outbox pattern avoids inconsistencies between a service's internal state and the events other services consume: a Debezium connector captures changes in an outbox table and applies the outbox event router transformation."],
       claims: ["change-data-capture-operations", "change-data-capture-outbox"],
     }),
     step({
@@ -79,8 +79,8 @@ export default defineGuide({
       caption: "The source row is removed. A delete event tells downstream consumers to remove their copy, so the old personal data does not remain there by accident.",
       show: ["delete", "deleted", "debezium"], counters: ["log read", "delete", "snapshot plus log", "yes"],
       rides: [ride("flow", "db-stop", 0.84, "delete 4471", { via: ["log-stop", "cdc-stop"] })],
-      body: ["A delete event identifies the removed row and gives a consumer the information needed to process its removal. The connector account also needs only the database privileges required to capture changes."],
-      claims: ["change-data-capture-operations", "change-data-capture-erasure"],
+      body: ["A delete event identifies the removed row and gives a consumer the information needed to process its removal. Debezium advises a dedicated replication user granted specific privileges rather than superuser privileges."],
+      claims: ["change-data-capture-operations", "change-data-capture-privileges", "change-data-capture-erasure"],
     }),
     step({
       id: "decide", label: "Choose", kind: "decision", title: "Choose capture by the change you need",
@@ -90,11 +90,11 @@ export default defineGuide({
       body: [{ pair: {
         left: { label: "Log capture", items: ["Ordered row changes", "Snapshot then stream", "Delete reaches each copy"] },
         right: { label: "Plan for", items: ["Log retention and slot health", "Least-privilege connector access", "Erasure across downstream copies"] },
-      } }, "For application-level events, write an outbox row in the same transaction as the business change, then capture the outbox. For a current-state replica, snapshot plus stream begins with the table and follows later changes."],
-      claims: ["change-data-capture-log", "change-data-capture-snapshot", "change-data-capture-outbox", "change-data-capture-erasure", "change-data-capture-operations"],
+      } }, "For application-level events, capture an outbox table and route its rows with the outbox event router. For a current-state replica, snapshot plus stream begins with the table and follows later changes."],
+      claims: ["change-data-capture-log", "change-data-capture-snapshot", "change-data-capture-outbox", "change-data-capture-erasure", "change-data-capture-operations", "change-data-capture-privileges"],
     }),
   ],
-  governance: { text: "EU GDPR Article 17 gives a data subject the right to obtain erasure without undue delay when a listed ground applies, subject to exceptions. Propagate deletion events to downstream copies and verify that each consumer applies them; use a dedicated capture user with specific privileges.", claims: ["change-data-capture-erasure", "change-data-capture-operations"] },
+  governance: { text: "EU GDPR Article 17 gives a data subject the right to obtain erasure without undue delay when a listed ground applies, subject to exceptions. Propagate deletion events to downstream copies and verify that each consumer applies them; Debezium advises a dedicated replication user with specific privileges rather than superuser privileges.", claims: ["change-data-capture-erasure", "change-data-capture-operations", "change-data-capture-privileges"] },
   closing: {
     pitfalls: [
       "Assuming the log contains the database's full history; old log segments may already be purged.",

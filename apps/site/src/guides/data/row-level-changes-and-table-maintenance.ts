@@ -44,15 +44,15 @@ export default defineGuide({
       caption: "Order 4471 and its customer email share a data file with other orders. Changing one row in the table does not edit those stored bytes in place.",
       show: ["before", "old"], counters: ["present", "0", "1"],
       rides: [ride("route", "s0", "s1", "erase 4471")],
-      body: ["Vinterhus has received a request to erase order 4471. The row sits in a file with other orders, so the current table and the stored file are not the same thing."],
-      claims: ["row-level-changes-and-table-maintenance-files"],
+      body: ["Vinterhus has received a request to erase order 4471. The row sits in a file with other orders, so the current table and the stored file are not the same thing. Iceberg data files are immutable once written."],
+      claims: ["row-level-changes-and-table-maintenance-files", "row-level-changes-and-table-maintenance-deletes"],
     }),
     step({
       id: "mask", label: "Mask", kind: "idea", title: "A delete marker changes what readers see",
       caption: "The table records a row-level delete. Readers apply its marker, so order 4471 disappears from the current view while the original file still contains it.",
       show: ["masked", "old", "marker-file"], counters: ["masked", "0", "1"],
       rides: [ride("route", "s1", "s2", "delete 4471")],
-      body: ["Iceberg stores row-level deletes in delete files. In supported formats, a deletion vector encodes deleted row positions as a bitmap for one data file."],
+      body: ["Iceberg stores row-level deletes in delete files. From format version 3, a deletion vector encodes the deleted positions of a single data file in a bitmap."],
       claims: ["row-level-changes-and-table-maintenance-deletes"],
     }),
     step({

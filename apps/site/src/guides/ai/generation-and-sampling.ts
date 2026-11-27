@@ -51,14 +51,14 @@ export default defineGuide({
       show: ["wide"], counters: ["distribution", "several candidates", "one more token", "not started"],
       rides: [ride("path", "s-choice", "s-token", "yes")],
       body: ["With a sampled decoding strategy, the model draws from its next-token distribution instead of always taking the highest-probability token. The next step uses the context including the token just chosen."],
-      claims: ["generation-and-sampling-sampling"],
+      claims: ["generation-and-sampling-sampling", "generation-and-sampling-autoregressive"],
     }),
     step({
       id: "settings", label: "Settings", kind: "mechanism", title: "Temperature and top-p reshape the choices",
       caption: "Temperature changes how concentrated the probabilities are. A lower setting can concentrate more probability on the leading choices.",
       show: ["narrow"], counters: ["reshaped scores", "smaller or wider set", "one more token", "not started"],
       rides: [ride("path", "s-choice", "s-token", "maybe", { then: "another valid sample" })],
-      body: ["Transformers exposes temperature as a parameter that modulates next-token probabilities. Holtzman and colleagues show that decoding choices affect diversity and repetition, even for the same language model.",
+      body: ["Transformers exposes temperature as a parameter that modulates next-token probabilities. Holtzman and colleagues show that decoding choices affect diversity and repetition, and that a temperature below 1 skews the distribution towards high-probability tokens.",
         { callout: { label: "Key idea", text: "Sampling settings change which continuations can be selected. They do not make the answer factual." } }],
       claims: ["generation-and-sampling-settings", "generation-and-sampling-diversity"],
     }),
@@ -67,8 +67,8 @@ export default defineGuide({
       caption: "Top-p keeps the smallest set whose cumulative probability reaches its threshold. A token is sampled from this shorter list of candidates.",
       show: ["top-p", "bounded"], counters: ["top-p filtered scores", "shorter candidate set", "capped", "stopped by limit or sequence"],
       rides: [ride("path", "s-token", "s-stop", "tokens", { then: "stop condition" })],
-      body: ["The Responses API uses `max_output_tokens` to cap generated tokens, including reasoning tokens. Transformers provides a stop-string criterion that ends generation when the specified text is completed. Which settings are available can depend on the model and interface."],
-      claims: ["generation-and-sampling-limits", "generation-and-sampling-stop"],
+      body: ["The Responses API uses `max_output_tokens` to cap generated tokens, including reasoning tokens. Transformers provides a stop-string criterion that ends generation when the specified text is completed."],
+      claims: ["generation-and-sampling-settings", "generation-and-sampling-limits", "generation-and-sampling-stop"],
     }),
     step({
       id: "visible", label: "Stream", kind: "watch-out", title: "Streaming shows output before generation finishes",
@@ -85,11 +85,11 @@ export default defineGuide({
       body: [{ pair: {
         left: { label: "Set", items: ["Sampling settings", "Output limit", "Stop conditions"] },
         right: { label: "Check", items: ["Repeated test runs", "Completed output", "Human review for support use"] },
-      } }, "Reasoning models can generate internal reasoning tokens before visible output. The vendor documentation states these tokens are not exposed through the API, but still consume context and count towards output. Do not mistake a reasoning summary or partial stream for a verified policy decision."],
+      } }, "Reasoning models use internal reasoning tokens to work through a prompt. The vendor documentation states these tokens are not visible through the API, but occupy the context window and are billed as output tokens, and that an output limit can be reached before any visible output. Do not mistake a reasoning summary or partial stream for a verified policy decision."],
       claims: ["generation-and-sampling-reasoning", "generation-and-sampling-governance"],
     }),
   ],
-  governance: { text: "Sampling produces varied text, so one successful output is not evidence that the support workflow is reliable. Keep decoding settings fixed during evaluation, run repeated trials, and review completed outputs before they affect refunds.", claims: ["generation-and-sampling-governance"] },
+  governance: { text: "Sampled output varies with the decoding settings, and OpenAI notes that streamed partial output is harder to moderate and evaluate. Evaluate repeated runs with the settings fixed, and review completed output before it affects a refund.", claims: ["generation-and-sampling-governance"] },
   closing: {
     pitfalls: [
       "Treating the highest-probability token as the only possible continuation.",
