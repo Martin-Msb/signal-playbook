@@ -1,0 +1,34 @@
+---
+import Base from "../../layouts/Base.astro";
+import { cases } from "../../data/cases.ts";
+import { concept } from "../../data/curriculum.ts";
+import { guides } from "../../guides/index.ts";
+import { built } from "../../cases/index.ts";
+import { loadLedger } from "../../lib/ledger.ts";
+
+await loadLedger();
+const live = new Set(guides.map((g) => g.slug));
+const open = new Set(built.map((g) => g.slug));
+---
+<Base title="Use cases · Signal Path" description="Business problems worked from the problem through the architecture to the execution, each naming the concepts it puts to work." track="case" tab="cases">
+  <div class="phead">
+    <div><h1>Use cases</h1><p class="gmeta" style="margin-top:8px"><span>{cases.length} business problems</span><span>{built.length} open</span>{cases.length > built.length && <span>{cases.length - built.length} planned</span>}</p></div>
+  </div>
+  <div class="caselist">
+    {cases.map((c) => (
+      <article class="case" id={c.key}>
+        <header>
+          <h2>{open.has(c.key) ? <a href={`/cases/${c.key}/`}>{c.title}</a> : c.title}</h2>
+          <span class:list={["st", { open: open.has(c.key) }]}>{open.has(c.key) ? "Open" : "Planned"}</span>
+        </header>
+        <div class="three">
+          <div><h3>Problem</h3><p>{c.problem}</p></div>
+          <div><h3>Architecture</h3><p>{c.architecture}</p></div>
+          <div><h3>Execution</h3><p>{c.execution}</p></div>
+        </div>
+        <p class="gov"><b>Governance and security.</b> {c.governance}</p>
+        <div class="uses"><b>Concepts at work</b>{c.uses.map((k) => { const x = concept(k)!; return <a class:list={[`t-${x.track}`, { plan: !live.has(k) }]} href={live.has(k) ? `/${x.track}/${k}/` : `/map/#${k}`}>{x.title}</a>; })}</div>
+      </article>
+    ))}
+  </div>
+</Base>

@@ -143,9 +143,9 @@ class SpGuide extends HTMLElement {
     const next = this.querySelector<HTMLButtonElement>("[data-next]");
     const label = this.querySelector("[data-next-label]");
     const last = i === steps.length - 1, kind = this.querySelector("[data-next-kind]");
-    if (back) { back.disabled = i === 0 && !this.dataset.prevUrl; back.setAttribute("aria-label", i === 0 && this.dataset.prevTitle ? `Previous concept: ${this.dataset.prevTitle}` : "Previous stop"); }
+    if (back) { back.disabled = i === 0 && !this.dataset.prevUrl; back.setAttribute("aria-label", i === 0 && this.dataset.prevTitle ? `Previous ${this.dataset.unit ?? "concept"}: ${this.dataset.prevTitle}` : "Previous stop"); }
     if (next) next.disabled = last && !this.dataset.nextUrl;
-    if (kind) kind.textContent = last && this.dataset.nextTitle ? "Next concept" : "Next stop";
+    if (kind) kind.textContent = last && this.dataset.nextTitle ? `Next ${this.dataset.unit ?? "concept"}` : "Next stop";
     if (label) label.textContent = last ? this.dataset.nextTitle ?? "Last stop" : steps[i + 1].label;
     const w = this.data.whatIf;
     this.querySelectorAll<HTMLButtonElement>("button.wif[data-whatif]").forEach((wb) => { wb.disabled = !w || i < w.from; wb.setAttribute("aria-pressed", "false"); });

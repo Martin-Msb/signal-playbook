@@ -143,3 +143,28 @@ Do not run `npm test`, `npm run build` or `npm run gen` while other guides are b
 - The named practices from the concept row appear in the guide.
 - The governance statement is specific to this concept and sourced.
 - `check-guide` reports no problems, and both sheets are clean in every stop.
+
+## Writing a use case
+
+A use case is a business problem at Vinterhus worked through three phases: the problem, the architecture, the execution. It teaches no new concept. It puts concepts of the curriculum to work and names each one at the stop where it acts.
+
+The list of use cases is `apps/site/src/data/cases.ts`. Each row gives the title, the problem, the architecture, the execution, the governance statement and the concepts the use case must show. Between them the rows cover every concept of the curriculum, and the tests fail if one is left out.
+
+| File | Contents |
+| --- | --- |
+| `apps/site/src/cases/<key>.ts` | The use case, written with `defineGuide` like a guide. |
+| `apps/site/src/ledger/cases/<key>.yaml` | Optional. Only for statements that no concept guide already references. Ids start with `case-<key>-`. |
+
+How it differs from a guide:
+
+- `id` is `case-<key>`, `slug` is the key, `track` is `"case"`, `module` is `"Use cases"`, and `title` is the row's title.
+- Eight to ten stops. Every stop has a `phase`: `problem`, `architecture` or `execution`, in that order, at least two stops each.
+- Every architecture and execution stop has `concepts`: the keys of the concepts it puts to work. Every concept in the row appears on at least one stop, and no stop names a concept outside the row.
+- The first stop is still `kind: "problem"` and the last `kind: "decision"` with a pair. The 40 word budget, the governance statement and the layout rules are unchanged.
+- **References are reused.** A stop cites the reference ids of the concept guides it draws on, such as `tool-calling-app-runs`. Read the fragments in `apps/site/src/ledger/guides/` for the concepts in the row and state only what they support. Scenario values are illustrative and the scene's `note` says so.
+
+The picture is one system that is assembled and then run. The problem stops show the situation without it. The architecture stops add one part at a time, each where its concept acts. The execution stops send real cases through the finished system: an ordinary one, a failure or an attack, and one that needs a person. Reference: `cases/refund-requests-answered-by-an-assistant`.
+
+```sh
+node scripts/check-guide.mjs case/<key>
+```

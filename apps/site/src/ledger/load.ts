@@ -1,4 +1,4 @@
-// Reads the evidence ledger from disk: the shared files plus one fragment per guide in ledger/guides/.
+// Reads the evidence ledger from disk: the shared files plus one fragment per guide in ledger/guides/ and per use case in ledger/cases/.
 // Plain Node, so the site build and the tests load it the same way.
 import { readFileSync, readdirSync, existsSync } from "node:fs";
 import { join } from "node:path";
@@ -16,11 +16,12 @@ export function readLedger(only?: string[]): { sources: Source[]; claims: Claim[
   const sources = (read(join(here, "sources.yaml")) as Source[]) ?? [];
   const claims = (read(join(here, "claims.yaml")) as Claim[]) ?? [];
   const errors: string[] = [];
-  const dir = join(here, "guides/");
-  if (existsSync(dir)) {
+  for (const folder of ["guides", "cases"]) {
+    const dir = join(here, `${folder}/`);
+    if (!existsSync(dir)) continue;
     for (const f of readdirSync(dir).filter((n) => n.endsWith(".yaml") && (!only || only.includes(n.slice(0, -5)))).sort()) {
       const frag = read(join(dir, f)) as { sources?: Source[]; claims?: Claim[] } | null;
-      if (!frag || Array.isArray(frag)) { errors.push(`ledger/guides/${f}: expected "sources:" and "claims:" lists`); continue; }
+      if (!frag || Array.isArray(frag)) { errors.push(`ledger/${folder}/${f}: expected "sources:" and "claims:" lists`); continue; }
       sources.push(...(frag.sources ?? []));
       claims.push(...(frag.claims ?? []));
     }

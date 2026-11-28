@@ -2,11 +2,15 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { checkLedger, renderScene, sceneCollisions, sceneWarnings, visibleWords } from "../src/index.ts";
-import { guides } from "../../../apps/site/src/guides/index.ts";
+import { guides as conceptGuides } from "../../../apps/site/src/guides/index.ts";
+import { built } from "../../../apps/site/src/cases/index.ts";
+import { builtCaseErrors, caseErrors, cases } from "../../../apps/site/src/data/cases.ts";
 import { readLedger } from "../../../apps/site/src/ledger/load.ts";
 import { concepts, curriculumErrors, guideErrors } from "../../../apps/site/src/data/curriculum.ts";
 
 const { sources, claims, errors } = readLedger();
+// Use cases are drawn and checked by the same rules as guides.
+const guides = [...conceptGuides, ...built];
 
 test("the curriculum is consistent", () => {
   assert.deepEqual(curriculumErrors(), []);
@@ -14,7 +18,16 @@ test("the curriculum is consistent", () => {
 });
 
 test("every guide sits on a concept of the curriculum", () => {
-  assert.deepEqual(guideErrors(guides), []);
+  assert.deepEqual(guideErrors(conceptGuides), []);
+});
+
+test("the use cases put every concept to work", () => {
+  assert.deepEqual(caseErrors(), []);
+  assert.ok(cases.length >= 12);
+});
+
+test("every built use case follows its row: three phases, and a stop for each concept it names", () => {
+  assert.deepEqual(builtCaseErrors(built), []);
 });
 
 test("every guide passes the ledger and copy rules", () => {

@@ -3,6 +3,7 @@
 //
 //   node scripts/check-guide.mjs <track>/<concept key>          checks, then contact sheets in light and dark
 //   node scripts/check-guide.mjs <track>/<concept key> --no-shots
+//   node scripts/check-guide.mjs case/<use case key>             the same for a use case in src/cases/
 //
 // It reads src/guides/<track>/<key>.ts and src/ledger/guides/<key>.yaml, plus the shared ledger files.
 // Exit code 0 means every rule passes. The sheets land in .shots/<key>-light.png and .shots/<key>-dark.png.
@@ -13,35 +14,38 @@ import { fileURLToPath, pathToFileURL } from "node:url";
 import { checkLedger, renderScene, sceneCollisions, sceneWarnings, visibleWords } from "../packages/engine/src/index.ts";
 import { readLedger } from "../apps/site/src/ledger/load.ts";
 import { concept, guideErrors } from "../apps/site/src/data/curriculum.ts";
+import { builtCaseErrors, caseOf } from "../apps/site/src/data/cases.ts";
 
 const root = fileURLToPath(new URL("../", import.meta.url));
 const [target, ...flags] = process.argv.slice(2);
-if (!target || !/^(data|ai|ml)\/[a-z0-9-]+$/.test(target)) {
-  console.error("usage: node scripts/check-guide.mjs <data|ai|ml>/<concept key> [--no-shots]");
+if (!target || !/^(data|ai|ml|case)\/[a-z0-9-]+$/.test(target)) {
+  console.error("usage: node scripts/check-guide.mjs <data|ai|ml>/<concept key> | case/<use case key> [--no-shots]");
   process.exit(2);
 }
 const [track, key] = target.split("/");
-const file = join(root, "apps/site/src/guides", track, `${key}.ts`);
+const isCase = track === "case";
+const file = isCase ? join(root, "apps/site/src/cases", `${key}.ts`) : join(root, "apps/site/src/guides", track, `${key}.ts`);
 if (!existsSync(file)) { console.error(`no guide file at ${file}`); process.exit(2); }
-if (!concept(key)) { console.error(`"${key}" is not a concept key in apps/site/src/data/curriculum.ts`); process.exit(2); }
+if (isCase && !caseOf(key)) { console.error(`"${key}" is not a use case key in apps/site/src/data/cases.ts`); process.exit(2); }
+if (!isCase && !concept(key)) { console.error(`"${key}" is not a concept key in apps/site/src/data/curriculum.ts`); process.exit(2); }
 
 const guide = (await import(pathToFileURL(file).href)).default;
-const { sources, claims, errors: shape } = readLedger([key]);
+const { sources, claims, errors: shape } = readLedger(isCase ? undefined : [key]); // a use case rests on the references of the concepts it uses
 const today = new Date().toISOString().slice(0, 10);
 const problems = [
   ...shape,
-  ...guideErrors([guide]),
+  ...(isCase ? builtCaseErrors([guide]) : guideErrors([guide])),
   ...checkLedger({ sources, claims, guides: [guide], today }),
   ...sceneWarnings(guide),
   ...sceneCollisions(guide),
 ];
-if (guide.steps.length !== 6) problems.push(`guide ${key}: has ${guide.steps.length} steps, needs 6`);
+if (!isCase && guide.steps.length !== 6) problems.push(`guide ${key}: has ${guide.steps.length} steps, needs 6`);
 if (!guide.scene.iso) problems.push(`guide ${key}: the scene needs an iso grid, so it stands on the floor like every other guide`);
-const own = new Set(claims.filter((c) => c.id.startsWith(`${key}-`)).map((c) => c.id));
+const own = new Set(claims.filter((c) => c.id.startsWith(isCase ? `case-${key}-` : `${key}-`)).map((c) => c.id));
 const used = new Set([...guide.steps.flatMap((s) => s.claims), ...(guide.governance?.claims ?? [])]);
 for (const id of own) if (!used.has(id)) problems.push(`claim ${id}: in the ledger fragment but used by no step`);
 const text = JSON.stringify(guide);
-if (/\b[DAM]\d{2}\b/.test(text.replace(/"id":"[^"]*"/g, ""))) problems.push(`guide ${key}: contains an ID code such as D06. Name concepts by title.`);
+if (/\b[DAM]\d{2}\b/.test(text.replace(/"id":"[^"]*"/g, "").replace(/"concepts":\[[^\]]*\]/g, ""))) problems.push(`guide ${key}: contains an ID code such as D06. Name concepts by title.`);
 
 console.log(`${guide.title} (${track})`);
 guide.steps.forEach((s, i) => console.log(`  ${i + 1}. ${s.kind.padEnd(9)} ${String(visibleWords(s)).padStart(2)} words  ${s.title}`));
@@ -101,7 +105,7 @@ if (!flags.includes("--no-shots")) {
       if (mean < 18) { problems.push(`the picture fills ${mean}% of the canvas on average, below 18%. A rail with a few labels is not a picture of the concept.`); console.log(`  - too sparse: ${mean}% of the canvas filled on average, needs 18%`); }
       fill.forEach((v, i) => { if (i >= 2 && v < 10) { problems.push(`stop ${i + 1}: the picture fills ${v}% of the canvas, below 10%`); console.log(`  - stop ${i + 1} is too sparse: ${v}% filled, needs 10%`); } });
     }
-    await p.screenshot({ path: join(out, `${key}-${theme}.png`) });
+    await p.screenshot({ path: join(out, `${key}-${theme}.png`), fullPage: true });
     await p.close();
     console.log(`sheet: ${join(out, `${key}-${theme}.png`)}`);
   }

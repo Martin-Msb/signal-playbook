@@ -87,6 +87,19 @@ const errs = [];
   ok(`the map has a stop for every concept (${stops})`, stops > 100);
   await p.hover('.net [data-stn="change-data-capture"]'); await p.waitForTimeout(150);
   ok("hovering a stop shows its card and what it builds on", await p.evaluate(() => !document.querySelector("[data-insp]").hidden && document.querySelector("[data-insp]").textContent.includes("Builds on") && document.querySelectorAll(".net .stn.need").length > 0));
+  await p.goto(`${base}/cases/`, { waitUntil: "networkidle" });
+  const nCases = await p.evaluate(() => document.querySelectorAll(".case").length);
+  ok(`the use case list shows every use case with its three phases (${nCases})`, nCases >= 12 && await p.evaluate(() => [...document.querySelectorAll(".case")].every((c) => c.querySelectorAll(".three > div").length === 3 && c.querySelectorAll(".uses a").length >= 8)));
+  await p.click(".case h2 a"); await p.waitForURL("**/cases/*/");
+  ok("a use case opens in its problem phase", await p.evaluate(() => getComputedStyle(document.querySelector('.phases [data-ph="problem"]')).backgroundColor !== getComputedStyle(document.querySelector('.phases [data-ph="execution"]')).backgroundColor));
+  for (let i = 0; i < 3; i++) await p.keyboard.press("ArrowRight");
+  await p.waitForTimeout(300);
+  ok("stepping moves the use case into its architecture phase", await p.evaluate(() => document.querySelector(".route li.cur").dataset.ph === "architecture" && document.querySelector(".sp.current .kind").textContent === "Architecture"));
+  const chip = await p.evaluate(() => document.querySelector(".sp.current .uses a")?.getAttribute("href"));
+  ok("a stop names the concepts at work and links to their guides", !!chip && /^\/(data|ai|ml)\//.test(chip));
+  await p.goto(base + chip, { waitUntil: "networkidle" });
+  ok("the concept's guide links back to the use case", await p.evaluate(() => [...document.querySelectorAll(".path a.t-case")].some((a) => a.getAttribute("href").startsWith("/cases/"))));
+  ok("no ID code is shown on a use case", await p.evaluate(() => !/\b[DAM]\d{2}\b/.test(document.querySelector("main").innerText)));
   await p.goto(`${base}/references/`); await p.waitForURL("**/map**", { timeout: 5000 }).catch(() => {});
   ok("the old References route leads to the Map", p.url().includes("/map"));
   await c.close();
@@ -95,7 +108,7 @@ const errs = [];
   const c = await browser.newContext({ viewport: { width: 390, height: 844 }, reducedMotion: "reduce" });
   const p = await c.newPage();
   p.on("pageerror", (e) => errs.push(e.message));
-  for (const route of ["/data/ingestion/#step-3", "/ml/loss-and-optimisation/#step-4", "/map/"]) {
+  for (const route of ["/data/ingestion/#step-3", "/ml/loss-and-optimisation/#step-4", "/map/", "/cases/", "/cases/refund-requests-answered-by-an-assistant/#step-7"]) {
     await p.goto("about:blank"); await p.goto(base + route, { waitUntil: "networkidle" });
     const over = await p.evaluate(() => document.documentElement.scrollWidth - innerWidth);
     ok(`no sideways scroll at phone width on ${route}`, over <= 0);

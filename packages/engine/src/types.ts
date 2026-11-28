@@ -1,5 +1,7 @@
 export type StepKind = "problem" | "idea" | "mechanism" | "watch-out" | "decision";
 export type TrackKey = "data" | "ai" | "ml";
+/** The three phases of a use case, in order. */
+export type Phase = "problem" | "architecture" | "execution";
 export type Pt = [number, number];
 /** Ink roles. track is the guide's line colour, alert is reserved for attacks and failures. */
 export type Tone = "ink" | "muted" | "track" | "alert";
@@ -269,11 +271,16 @@ export interface Step {
   body: Block[];
   /** Ledger claim ids that back this step. */
   claims: string[];
+  /** Use cases only: the phase this stop belongs to. */
+  phase?: Phase;
+  /** Use cases only: keys of the curriculum concepts this stop puts to work. */
+  concepts?: string[];
 }
 
 export interface Guide {
   id: string;
-  track: TrackKey;
+  /** A guide sits on a track. A use case crosses tracks and has the track "case". */
+  track: TrackKey | "case";
   module: string;
   slug: string;
   title: string;

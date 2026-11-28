@@ -19,7 +19,14 @@ for (const track of ["data", "ai", "ml"]) {
     pages.push({ track, slug, html, id: pick(html, /<sp-guide data-id="([a-z0-9-]+)"/) });
   }
 }
-const home = read(""), map = read("map");
+// Use cases: one page each, plus the list.
+const caseDir = join(dist, "cases");
+if (existsSync(caseDir)) for (const slug of readdirSync(caseDir)) {
+  if (!existsSync(join(caseDir, slug, "index.html"))) continue;
+  const html = read(`cases/${slug}`);
+  pages.push({ track: "cases", cls: "case", slug, html, id: pick(html, /<sp-guide data-id="([a-z0-9-]+)"/) });
+}
+const home = read(""), map = read("map"), caseList = existsSync(join(caseDir, "index.html")) ? read("cases") : "";
 const first = pick(home, /<sp-guide data-id="([a-z0-9-]+)"/);
 
 // Styles: one copy, with the Latin font files embedded and the other subsets dropped.
@@ -37,23 +44,24 @@ const relink = (html) => {
     html = html.replaceAll(new RegExp(`href="/${p.track}/${p.slug}/#step-\\d+"`, "g"), `href="#${p.id}"`);
     html = html.replaceAll(`href="/${p.track}/${p.slug}/"`, `href="#${p.id}"`).replaceAll(`-url="/${p.track}/${p.slug}/"`, `-url="#${p.id}"`);
   }
-  return html.replace(/href="\/map\/#[a-z0-9-]+"/g, 'href="#map"').replaceAll('href="/map/"', 'href="#map"').replaceAll('href="/"', `href="#${first}"`);
+  return html.replace(/href="\/cases\/#[a-z0-9-]+"/g, 'href="#cases"').replaceAll('href="/cases/"', 'href="#cases"').replace(/href="\/map\/#[a-z0-9-]+"/g, 'href="#map"').replaceAll('href="/map/"', 'href="#map"').replaceAll('href="/"', `href="#${first}"`);
 };
-const guideView = (p) => `<div class="view t-${p.track}" id="${p.id}" data-tab="learn" hidden>${mainOf(p.html).replace("<sp-guide", '<sp-guide data-hash="off"').replace(/ id="stop-\d+"/g, "")}</div>`;
+const guideView = (p) => `<div class="view t-${p.cls ?? p.track}" id="${p.id}" data-tab="${p.cls ? "cases" : "learn"}" hidden>${mainOf(p.html).replace("<sp-guide", '<sp-guide data-hash="off"').replace(/ id="stop-\d+"/g, "")}</div>`;
 
 const shell = relink(home.slice(home.indexOf("<header"), home.indexOf("<main")).replace(/ aria-current="page"/g, "").replace(/class="g current"/g, 'class="g"'));
 const views = relink(pages.map(guideView).join("\n")
-  + `\n<div class="view" id="map" data-tab="map" hidden>${mainOf(map)}</div>`);
+  + `\n<div class="view" id="map" data-tab="map" hidden>${mainOf(map)}</div>`
+  + (caseList ? `\n<div class="view t-case" id="cases" data-tab="cases" hidden>${mainOf(caseList)}</div>` : ""));
 // Search results and map stations build their links from JSON: point those at the hash routes too.
 const urls = Object.fromEntries(pages.map((p) => [`/${p.track}/${p.slug}/`, `#${p.id}`]));
-const relinkJson = (html) => html.replace(/"(\/(?:data|ai|ml)\/[^"]+\/)"/g, (m, u) => (urls[u] ? `"${urls[u]}"` : m)).replace(/"\/map\/#[a-z0-9-]+"/g, '"#map"');
+const relinkJson = (html) => html.replace(/"(\/(?:data|ai|ml|cases)\/[^"]+\/)"/g, (m, u) => (urls[u] ? `"${urls[u]}"` : m)).replace(/"\/map\/#[a-z0-9-]+"/g, '"#map"').replace(/"\/cases\/#[a-z0-9-]+"/g, '"#cases"');
 
 const router = `const views=[...document.querySelectorAll(".view")];
 function show(){let id=(location.hash||"#${first}").slice(1);const v=document.getElementById(id);if(!v||!v.classList.contains("view"))return;
 views.forEach(x=>x.hidden=x!==v);
 document.querySelectorAll(".tabs a").forEach(a=>a.classList.toggle("current",a.dataset.tab===v.dataset.tab));
 document.querySelectorAll("a.g[data-guide]").forEach(a=>a.classList.toggle("current",a.dataset.guide===id));
-if(v.dataset.tab==="learn")document.querySelectorAll(".side details").forEach(d=>d.open=!!d.querySelector("a.g.current"));
+if(v.dataset.tab!=="map")document.querySelectorAll(".side details").forEach(d=>d.open=!!d.querySelector("a.g.current"));
 scrollTo(0,0);}
 addEventListener("hashchange",show);show();`;
 
@@ -75,4 +83,4 @@ const left = html.match(/(?:src|href)="\/(?!\/)[^"]*"/g);
 if (left) console.warn("unresolved site-relative references:", [...new Set(left)]);
 mkdirSync("preview", { recursive: true });
 writeFileSync("preview/app.html", html);
-console.log(`preview/app.html ${(html.length / 1024).toFixed(0)} KiB, ${pages.length} guides`);
+console.log(`preview/app.html ${(html.length / 1024).toFixed(0)} KiB, ${pages.length} guides and use cases`);

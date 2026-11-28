@@ -1,0 +1,15 @@
+---
+import Base from "../../layouts/Base.astro";
+import GuideView from "../../components/Guide.astro";
+import { built } from "../../cases/index.ts";
+import type { Guide } from "@signal-path/engine";
+
+export function getStaticPaths() {
+  return built.map((guide) => ({ params: { slug: guide.slug }, props: { guide } }));
+}
+interface Props { guide: Guide }
+const { guide } = Astro.props;
+---
+<Base title={`${guide.title} · Signal Path`} description={guide.summary} track="case" current={guide.id} tab="cases">
+  <GuideView guide={guide} />
+</Base>

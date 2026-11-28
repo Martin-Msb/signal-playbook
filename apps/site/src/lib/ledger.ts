@@ -3,6 +3,8 @@ import type { Claim, Guide, Source, Step } from "@signal-path/engine";
 import { guides } from "../guides/index.ts";
 import { readLedger } from "../ledger/load.ts";
 import { curriculumErrors, guideErrors } from "../data/curriculum.ts";
+import { builtCaseErrors, caseErrors } from "../data/cases.ts";
+import { built } from "../cases/index.ts";
 export { guideErrors };
 
 export interface Ledger {
@@ -20,7 +22,7 @@ export async function loadLedger(): Promise<Ledger> {
   if (cached) return cached;
   const { sources, claims, errors: shape } = readLedger();
   const today = process.env.SP_TODAY ?? new Date().toISOString().slice(0, 10);
-  const errors = [...shape, ...curriculumErrors(), ...guideErrors(guides), ...checkLedger({ sources, claims, guides, today })];
+  const errors = [...shape, ...curriculumErrors(), ...guideErrors(guides), ...caseErrors(), ...builtCaseErrors(built), ...checkLedger({ sources, claims, guides: [...guides, ...built], today })];
   if (errors.length > 0) {
     throw new Error(`Build checks failed (${errors.length}):\n${errors.map((e) => `  - ${e}`).join("\n")}`);
   }

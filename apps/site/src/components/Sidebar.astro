@@ -1,10 +1,13 @@
 ---
 import { tracks } from "../data/curriculum.ts";
 import { guides } from "../guides/index.ts";
+import { cases } from "../data/cases.ts";
+import { built } from "../cases/index.ts";
 interface Props { current?: string }
 const { current } = Astro.props;
 const live = new Map(guides.map((g) => [g.slug, g]));
 const total = tracks.reduce((n, t) => n + t.concepts.length, 0);
+const liveCases = new Set(built.map((g) => g.slug));
 const has = (cs: { key: string }[]) => !!current && cs.some((c) => c.key === current);
 ---
 <div class="side-head"><b>Lines</b><span><span data-done-count>0</span> of {guides.length} read, {total} concepts</span></div>
@@ -21,3 +24,9 @@ const has = (cs: { key: string }[]) => !!current && cs.some((c) => c.key === cur
     ))}
   </details>
 ))}
+<details class="trk t-case" open={has(cases.map((c) => ({ key: `case-${c.key}` })))}>
+  <summary><i></i><span>Use cases</span><small>{built.length} of {cases.length} open</small></summary>
+  {cases.map((c) => liveCases.has(c.key)
+    ? <a class:list={["g", { current: `case-${c.key}` === current }]} href={`/cases/${c.key}/`} data-guide={`case-${c.key}`} aria-current={`case-${c.key}` === current ? "page" : undefined}><span>{c.title}</span></a>
+    : <a class="g plan" href={`/cases/#${c.key}`} title="Planned. Opens its entry in the list of use cases."><span>{c.title}</span></a>)}
+</details>

@@ -1,6 +1,6 @@
 import type {
   ArrowEl, BlocksEl, BoxEl, Cell, CellsEl, CodeEl, DbEl, DocEl, DrumEl, El, Hue, Iso, LabelEl, LayersEl, LineEl, ListEl, ModelEl, NodeEl, PawnEl, PersonEl, PillEl, PlotEl, PrismEl, Pt, Ride,
-  SeriesEl, SlabEl, Step, StepKind, StopEl, TableEl, TankEl, TreeEl, ZoneEl, Block,
+  Phase, SeriesEl, SlabEl, Step, StepKind, StopEl, TableEl, TankEl, TreeEl, ZoneEl, Block,
 } from "./types.ts";
 import { cellsSize, codeHeight, layerUnitPositions, listHeight, project, tableHeight } from "./render.ts";
 
@@ -28,7 +28,7 @@ export const ride = (line: string, from: string | number, to: string | number, l
 /** A step. Strings in the body become paragraphs of detail. */
 export const step = (s: {
   id: string; label: string; kind: StepKind; title: string; caption: string;
-  show: string[]; counters: string[]; body: (string | Block)[]; claims: string[]; rides?: Ride[];
+  show: string[]; counters: string[]; body: (string | Block)[]; claims: string[]; rides?: Ride[]; phase?: Phase; concepts?: string[];
 }): Step => ({ ...s, body: s.body.map((b) => (typeof b === "string" ? { p: b } : b)) });
 
 /* ---------- the floor ---------- */

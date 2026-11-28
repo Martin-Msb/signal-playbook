@@ -1,12 +1,16 @@
 # Signal Path
 
-A visual curriculum of Data, AI and ML concepts. Version 3.0.0.
+A visual curriculum of Data, AI and ML concepts. Version 3.2.0.
 
 Each guide teaches one concept through one picture stepped through six stops. The picture is a floor seen from above at an angle: systems stand on it as solid objects, rails connect them, data lies on it as blocks, charts and tables stand on posts, and a record moves through it and changes at each stop. Every statement traces to a dated source.
 
 ## The curriculum
 
 `apps/site/src/data/curriculum.ts` is the single source of structure: 121 concepts in three tracks, in teaching order. Each concept states what the reader understands afterwards, what it builds on, the current practice that belongs to it, and where governance and security appear. A guide is a concept that has been built. The rest show on the Map as planned stops.
+
+## Use cases
+
+`apps/site/src/data/cases.ts` lists 18 business problems at Vinterhus. Each is worked through three phases, the problem, the architecture and the execution, and names the concepts it puts to work. Between them the use cases cover all 121 concepts, and the tests fail if one is left out. A use case is drawn with the same scene grammar as a guide, in eight to ten stops, and cites the references of the concept guides it draws on. All 18 are built in `apps/site/src/cases/`. One adds a reference of its own in `apps/site/src/ledger/cases/`.
 
 ## Layout
 
@@ -43,6 +47,7 @@ npm run preview:app   # the whole site as one HTML file with hash navigation, pr
 | Page | Route | Contents |
 | --- | --- | --- |
 | Learn | `/<track>/<key>/` | One guide, with the stepping bar pinned in view. The last stop leads to the next concept in curriculum order. Shows what it builds on and unlocks, route bar, picture, caption, state, and disclosure for detail, pitfalls, questions, governance, lead notes and references. |
+| Use cases | `/cases/` and `/cases/<key>/` | The list of business problems with their problem, architecture, execution, governance and concepts. An open use case steps through its three phases, and each stop links to the guides of the concepts at work. Each guide links back to the use cases it is used in. |
 | Map | `/map/` | The Data, AI and ML lines with one stop per concept: open and planned, read stops, governance and security stops, and what each stop builds on and unlocks. |
 
 ## Build rules
@@ -65,6 +70,10 @@ Claim classes: A durable mechanism, B current practice, C dated fact. The reader
 ## Adding a guide
 
 Read `docs/authoring.md`. In short: evidence first, picture second, words last. Write `src/guides/<track>/<key>.ts` and `src/ledger/guides/<key>.yaml`, then run `node scripts/check-guide.mjs <track>/<key>` and look at both contact sheets until every stop is clean.
+
+## Adding a use case
+
+Read the last section of `docs/authoring.md`. Write `src/cases/<key>.ts` for a row of `src/data/cases.ts`, then run `node scripts/check-guide.mjs case/<key>` and look at both contact sheets.
 
 ## Scene grammar
 

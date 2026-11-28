@@ -4,6 +4,8 @@ import type { Guide } from "@signal-path/engine";
 import { fmtDate, loadLedger, references, stepMark } from "../lib/ledger.ts";
 import { concept, unlocks } from "../data/curriculum.ts";
 import { guides } from "../guides/index.ts";
+import { caseOf, casesFor, PHASES } from "../data/cases.ts";
+import { built } from "../cases/index.ts";
 import Icon from "./Icon.astro";
 
 interface Props { guide: Guide }
@@ -11,15 +13,23 @@ const { guide } = Astro.props;
 const ledger = await loadLedger();
 
 const kindLabel = { problem: "Problem", idea: "Idea", mechanism: "Mechanism", "watch-out": "Watch out", decision: "Decision" } as const;
-const c = concept(guide.slug)!;
+// A use case is drawn by the same component: it has phases and names the concepts each stop puts to work.
+const isCase = guide.track === "case";
+const uc = isCase ? caseOf(guide.slug)! : undefined;
+const c = isCase ? undefined : concept(guide.slug)!;
 const live = new Set(guides.map((g) => g.slug));
+const liveCases = new Set(built.map((g) => g.slug));
+const phaseLabel = { problem: "Problem", architecture: "Architecture", execution: "Execution" } as const;
+const phaseSpans = PHASES.map((ph) => ({ ph, n: guide.steps.filter((s) => s.phase === ph).length }));
+const usedIn = c ? casesFor(c.key).map((k) => ({ title: k.title, href: liveCases.has(k.key) ? `/cases/${k.key}/` : `/cases/#${k.key}`, open: liveCases.has(k.key) })) : [];
 const link = (key: string) => { const k = concept(key)!; return { title: k.title, track: k.track, href: live.has(key) ? `/${k.track}/${key}/` : `/map/#${key}`, open: live.has(key) }; };
-const before = [...c.buildsOn, ...c.seeAlso].map(link), after = unlocks(c.key).map((k) => link(k.key));
+const before = c ? [...c.buildsOn, ...c.seeAlso].map(link) : [], after = c ? unlocks(c.key).map((k) => link(k.key)) : [];
 const refs = references(ledger, guide);
 // The guides before and after this one, in curriculum order, so the reader can keep going without the menu.
-const at = guides.findIndex((g) => g.slug === guide.slug);
-const prevG = guides[at - 1], nextG = guides[at + 1];
-const urlOf = (g?: Guide) => (g ? `/${g.track}/${g.slug}/` : undefined);
+const row = isCase ? built : guides;
+const at = row.findIndex((g) => g.slug === guide.slug);
+const prevG = row[at - 1], nextG = row[at + 1];
+const urlOf = (g?: Guide) => (g ? (g.track === "case" ? `/cases/${g.slug}/` : `/${g.track}/${g.slug}/`) : undefined);
 const payload = JSON.stringify({
   always: guide.scene.els.filter((e) => e.always).map((e) => e.id),
   steps: guide.steps.map((s) => ({ label: s.label, show: s.show, counters: s.counters })),
@@ -28,24 +38,28 @@ const payload = JSON.stringify({
 const oldest = (ids: string[]) => ids.map((id) => ledger.claim(id).verified).sort()[0];
 const first = guide.steps[0];
 ---
-<sp-guide data-id={guide.id} class={`t-${guide.track}`} data-prev-url={urlOf(prevG)} data-prev-title={prevG?.title} data-next-url={urlOf(nextG)} data-next-title={nextG?.title}>
+<sp-guide data-id={guide.id} data-unit={isCase ? "use case" : undefined} class={`t-${guide.track}`} data-prev-url={urlOf(prevG)} data-prev-title={prevG?.title} data-next-url={urlOf(nextG)} data-next-title={nextG?.title}>
   <script is:inline type="application/json" set:html={payload}></script>
   <header class="ghead">
-    <a class="badge" href={`/map/#${guide.slug}`} aria-label={`${guide.title} on the map`}>{c.trackName}</a>
+    {c
+      ? <a class="badge" href={`/map/#${guide.slug}`} aria-label={`${guide.title} on the map`}>{c.trackName}</a>
+      : <a class="badge" href={`/cases/#${guide.slug}`} aria-label="All use cases">Use case</a>}
     <div>
       <h1>{guide.title}</h1>
-      <p class="gmeta"><span>{c.stage}</span><span>{guide.minutes} min</span><span>{guide.status === "published" ? "Reviewed" : "Draft"}</span></p>
+      <p class="gmeta">{c ? <span>{c.stage}</span> : <span>{uc!.uses.length} concepts at work</span>}<span>{guide.minutes} min</span><span>{guide.status === "published" ? "Reviewed" : "Draft"}</span></p>
     </div>
   </header>
-  <nav class="path" aria-label="Where this concept sits">
+  {c && <nav class="path" aria-label="Where this concept sits">
     <div><b>Builds on</b>{before.length ? before.map((l) => <a href={l.href} class:list={[`t-${l.track}`, { plan: !l.open }]}>{l.title}</a>) : <span>Nothing. This is where the line starts.</span>}</div>
     {after.length > 0 && <div><b>Unlocks</b>{after.map((l) => <a href={l.href} class:list={[`t-${l.track}`, { plan: !l.open }]}>{l.title}</a>)}</div>}
-  </nav>
+    {usedIn.length > 0 && <div><b>Used in</b>{usedIn.map((l) => <a href={l.href} class:list={["t-case", { plan: !l.open }]}>{l.title}</a>)}</div>}
+  </nav>}
+  {isCase && <div class="phases" style={`--n:${guide.steps.length}`} aria-hidden="true">{phaseSpans.map((p) => <span data-ph={p.ph} style={`grid-column: span ${p.n}`}>{phaseLabel[p.ph]}</span>)}</div>}
 
   <nav class="route" aria-label="Stops in this guide">
     <ol style={`--n:${guide.steps.length}`}>
       {guide.steps.map((s, i) => (
-        <li data-stop class:list={{ cur: i === 0 }}><button type="button" data-goto={i} aria-current={i === 0 ? "step" : undefined}><span class="o">{i + 1}</span><span class="l">{s.label}</span></button></li>
+        <li data-stop data-ph={s.phase} class:list={{ cur: i === 0 }}><button type="button" data-goto={i} aria-current={i === 0 ? "step" : undefined}><span class="o">{i + 1}</span><span class="l">{s.label}</span></button></li>
       ))}
     </ol>
   </nav>
@@ -70,10 +84,11 @@ const first = guide.steps[0];
         const detail = step.body.filter((b) => "p" in b || "callout" in b);
         return (
           <article class:list={["sp", { current: i === 0 }]} data-step={i} id={`stop-${i + 1}`}>
-            <div class="kick"><span class="num">{i + 1}</span>Stop {i + 1} of {guide.steps.length}<span class={`kind k-${step.kind}`}>{kindLabel[step.kind]}</span></div>
+            <div class="kick"><span class="num">{i + 1}</span>Stop {i + 1} of {guide.steps.length}{step.phase ? <span class={`kind k-${step.phase}`}>{phaseLabel[step.phase]}</span> : <span class={`kind k-${step.kind}`}>{kindLabel[step.kind]}</span>}</div>
             <h2>{step.title}</h2>
             {step.caption && <p class="cap">{step.caption}</p>}
             {mark && bars.length === 0 && <p class="dated">{mark}</p>}
+            {step.concepts && step.concepts.length > 0 && <div class="uses"><b>Concepts at work</b>{step.concepts.map((k) => { const l = link(k); return <a href={l.href} class={`t-${l.track}`}>{l.title}</a>; })}</div>}
             {pairs.map((b) => "pair" in b && (
               <div class="fork">
                 {[b.pair.left, b.pair.right].map((side, k) => (
@@ -131,7 +146,7 @@ const first = guide.steps[0];
       </div>
 
       <div class="navs">
-        <button class="nb" type="button" data-back disabled={!prevG} aria-label="Previous stop" title={prevG ? `Previous concept: ${prevG.title}` : undefined}><Icon name="arrowL" /></button>
+        <button class="nb" type="button" data-back disabled={!prevG} aria-label="Previous stop" title={prevG ? `Previous ${isCase ? "use case" : "concept"}: ${prevG.title}` : undefined}><Icon name="arrowL" /></button>
         <button class="nb go" type="button" data-next><span><small data-next-kind>Next stop</small><span data-next-label>{guide.steps[1]?.label}</span></span><Icon name="arrowR" /></button>
       </div>
       <p class="keys"><span><kbd>←</kbd> <kbd>→</kbd> stops</span><span><kbd>R</kbd> replay</span>{guide.whatIf && <span><kbd>W</kbd> what if</span>}</p>
